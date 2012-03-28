@@ -1026,62 +1026,105 @@ class Beautiful_custom_fields {
 		//$real_id =  wp_is_post_revision($post_id);
 		
 		//if ($post_id == $real_id) {
-
 			//Ritrovo i campi da salvare
 			foreach ( $bcf_fields as $box_id => $fields ) {
-				foreach ( $fields as $cf_name => $field ) {
-
-					//Se fa parte del post lo salvo
-					//$to_save = false;
-					
-					/*				
-					if (get_post_type( $post_id ) == 'post') {
-						
-						//echo "SALVO ";
-						//var_dump($field->categories);
-					
-						if ( in_category( $field->categories, $post_id )) {
+			
+				if (is_array($fields)) {
+			
+					foreach ( $fields as $cf_name => $field ) {
 	
-							$to_save = true;	
-						}
-					} else if (get_post_type( $post_id ) == 'page') {
-						if ( in_array( $post_id, (is_array($field->pages) ? $field->pages : array() ) ) ) {
-							$to_save = true;
-						}
-					} else {
-						if ( in_array( get_post_type( $post_id ), (is_array($field->custom_post_types) ? $field->custom_post_types : array() ) ) ) {
-							$to_save = true;
-						}
-					}
-					*/
-					
-					
-					
-					//var_dump($cf_value, $to_save);		
-					//$bcf_fields
-					
-					//if ($to_save) {
-					
-						//$value = $_REQUEST["bfc_".$cf_value];
+						//Se fa parte del post lo salvo
+						//$to_save = false;
 						
-						//Inizializzo il campo
-						$class_name = "bcf_".$field->type;
+						/*				
+						if (get_post_type( $post_id ) == 'post') {
+							
+							//echo "SALVO ";
+							//var_dump($field->categories);
 						
-						if ( class_exists( $class_name ) ) {
-							
-							//$f = new $class_name($this->multilanguage);
-							$f = new $class_name();
-							//$value = $f->save_field($field, $cf_name, $this->multilanguage);
-							
-							//Nome del campo inviato
-							$name = "bcf_" . $cf_name;
-							$save_value = "";						
-							
-							$value = $_REQUEST[$name];
-							
-
+							if ( in_category( $field->categories, $post_id )) {
+		
+								$to_save = true;	
+							}
+						} else if (get_post_type( $post_id ) == 'page') {
+							if ( in_array( $post_id, (is_array($field->pages) ? $field->pages : array() ) ) ) {
+								$to_save = true;
+							}
+						} else {
+							if ( in_array( get_post_type( $post_id ), (is_array($field->custom_post_types) ? $field->custom_post_types : array() ) ) ) {
+								$to_save = true;
+							}
+						}
+						*/
 						
-							if ($field->multiple == 1) {
+						
+						
+						//var_dump($cf_value, $to_save);		
+						//$bcf_fields
+						
+						//if ($to_save) {
+						
+							//$value = $_REQUEST["bfc_".$cf_value];
+							
+							//Inizializzo il campo
+							$class_name = "bcf_".$field->type;
+							
+							if ( class_exists( $class_name ) ) {
+								
+								//$f = new $class_name($this->multilanguage);
+								$f = new $class_name();
+								//$value = $f->save_field($field, $cf_name, $this->multilanguage);
+								
+								//Nome del campo inviato
+								$name = "bcf_" . $cf_name;
+								$save_value = "";						
+								
+								$value = $_REQUEST[$name];
+								
+	
+							
+								if ($field->multiple == 1) {
+									
+										if ($field->multilanguage == 1) {
+											
+											//becco le lingue disponibili
+											$pm_lang = $this->lang;
+											
+											if (is_array($pm_lang)) {
+											
+												//Becco i campi con la lingua indicata
+												foreach ($pm_lang as $l) {
+												
+													$qt_name = $name."_".$l;											
+													$value = $_REQUEST[$qt_name];
+													
+													//Otengo l'array con il valore
+													if (!is_array($value)) {
+														$value = array("");
+													}
+													foreach ($value as $k => $_value) {
+														$save_value[$k] .= "<!--:$l-->" . $f->save_field($field, $_value, $qt_name) . "<!--:-->";
+													}
+													
+												}
+												
+											}
+											
+										} else {
+										
+											$save_value = array();
+											if (!is_array($value)) {
+												$value = array();
+											}
+											foreach ($value as $_value) {
+										
+												$save_value[] = $f->save_field($field, $_value, $name);	
+											
+											}
+											
+										}
+										
+								} else {
 								
 									if ($field->multilanguage == 1) {
 										
@@ -1095,106 +1138,67 @@ class Beautiful_custom_fields {
 											
 												$qt_name = $name."_".$l;											
 												$value = $_REQUEST[$qt_name];
-												
-												//Otengo l'array con il valore
-												if (!is_array($value)) {
-													$value = array("");
-												}
-												foreach ($value as $k => $_value) {
-													$save_value[$k] .= "<!--:$l-->" . $f->save_field($field, $_value, $qt_name) . "<!--:-->";
-												}
+												$save_value .= "<!--:$l-->" . $f->save_field($field, $value, $qt_name) . "<!--:-->";
 												
 											}
 											
 										}
 										
 									} else {
-									
-										$save_value = array();
-										if (!is_array($value)) {
-											$value = array();
-										}
-										foreach ($value as $_value) {
-									
-											$save_value[] = $f->save_field($field, $_value, $name);	
-										
-										}
-										
-									}
-									
-							} else {
-							
-								if ($field->multilanguage == 1) {
-									
-									//becco le lingue disponibili
-									$pm_lang = $this->lang;
-									
-									if (is_array($pm_lang)) {
-									
-										//Becco i campi con la lingua indicata
-										foreach ($pm_lang as $l) {
-										
-											$qt_name = $name."_".$l;											
-											$value = $_REQUEST[$qt_name];
-											$save_value .= "<!--:$l-->" . $f->save_field($field, $value, $qt_name) . "<!--:-->";
-											
-										}
-										
-									}
-									
-								} else {
-							
-									$save_value = $f->save_field($field, $value, $name);	
 								
+										$save_value = $f->save_field($field, $value, $name);	
+									
+									}
 								}
-							}
-						
-							//Se il campo è multimplo salvo i vari valori
 							
-							//Eseguo la funzione che processa il valore e mi restituisce il valore da salvare
-							//$value = $f->save_field($field, $cf_name, $this->multilanguage);
+								//Se il campo è multimplo salvo i vari valori
+								
+								//Eseguo la funzione che processa il valore e mi restituisce il valore da salvare
+								//$value = $f->save_field($field, $cf_name, $this->multilanguage);
+		
+								do_action('bcf_save_meta_'.$cf_name, $post_id, $save_value, $cf_name);
+								do_action('bcf_save_meta', $post_id, $save_value, $cf_name);						
 	
-							do_action('bcf_save_meta_'.$cf_name, $post_id, $save_value, $cf_name);
-							do_action('bcf_save_meta', $post_id, $save_value, $cf_name);						
-
-							if (is_array($save_value)) {
-							
-								//Cancello tutti le chiavi e le reinserisco
-								delete_post_meta($post_id, $cf_name);
+								if (is_array($save_value)) {
 								
-								foreach ($save_value as $v) {
-										
-									add_post_meta($post_id, $cf_name, $v);
+									//Cancello tutti le chiavi e le reinserisco
+									delete_post_meta($post_id, $cf_name);
+									
+									foreach ($save_value as $v) {
+											
+										add_post_meta($post_id, $cf_name, $v);
+									}
+								
+								} else {
+	
+									update_post_meta($post_id, $cf_name, $save_value);
+								
 								}
-							
-							} else {
-
-								update_post_meta($post_id, $cf_name, $save_value);
-							
+								
 							}
 							
-						}
-						
-						/*
-						
-						
-						//echo "SALVO ".$this->multilanguage;					
-						if ($this->multilanguage && $field->multilanguage == 1) {
-							//echo "SALVO ML";
-							//Riunisco il valore delle lingue
-							$lang = qtrans_getSortedLanguages();
+							/*
 							
-							$text = array();
-							foreach ($lang as $l) {
-								$text[$l] = $_REQUEST["bfc_".$cf_value."_".$l];
+							
+							//echo "SALVO ".$this->multilanguage;					
+							if ($this->multilanguage && $field->multilanguage == 1) {
+								//echo "SALVO ML";
+								//Riunisco il valore delle lingue
+								$lang = qtrans_getSortedLanguages();
+								
+								$text = array();
+								foreach ($lang as $l) {
+									$text[$l] = $_REQUEST["bfc_".$cf_value."_".$l];
+								}
+								$value = qtrans_join($text);
 							}
-							$value = qtrans_join($text);
-						}
-						*/
+							*/
+							
+							//update_post_meta($post_id, $cf_value, $value);
+						//}
 						
-						//update_post_meta($post_id, $cf_value, $value);
-					//}
-					
+					}
+				
 				}
 				
 			}

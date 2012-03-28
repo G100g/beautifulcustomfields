@@ -88,11 +88,13 @@ class Beautiful_custom_fields_admin {
 	
 	}
 	
+	/*
 	function _array_remove_key ()
 	{
 	  $args  = func_get_args();
 	  return array_diff_key($args[0],array_flip(array_slice($args,1)));
 	}
+	*/
 	
 	function create_field($name, $cf_name, $type_options, $taxonomy, $posts_ids, $custom_post_types, $type, $sort, $multiple, $multilanguage, $depth, $page_template_ids) {
 	
@@ -386,7 +388,9 @@ class Beautiful_custom_fields_admin {
 				  			$tmp_bcf_fields = unserialize( get_option('bcf_fields') );			  			
 				  			
 				  			//Rimuovo la chiave dal'aaray
-				  			$tmp_bcf_fields[$_REQUEST['nf_box']] = $this->_array_remove_key($tmp_bcf_fields[0], $_REQUEST['cf_name']);
+				  			//$tmp_bcf_fields[$_REQUEST['nf_box']] = $this->_array_remove_key($tmp_bcf_fields[0], $_REQUEST['cf_name']);
+				  			
+				  			unset($tmp_bcf_fields[$_REQUEST['nf_box']][$_REQUEST['cf_name']]);
 				  			
 				  			update_option( 'bcf_fields', serialize( $tmp_bcf_fields ) );
 				  			
@@ -514,7 +518,10 @@ class Beautiful_custom_fields_admin {
 
 <?php endforeach; endif; ?>	
 	
+	
 	<div id="forms">
+	
+		<?php if (is_array($bcf_boxs) && !empty($bcf_boxs)) : ?>
 	
 		<div id="form-field" class="metabox-holder disabled-metabox-holder-disabled">
 		
@@ -522,7 +529,7 @@ class Beautiful_custom_fields_admin {
 		
 				<h3><span>New Field</span></h3>
 				<div class="inside">	
-		
+				
 					<form action="<?php echo $action_url; ?>" method="post">
 						<input type="hidden" name="action" value="add" />
 						<input type="hidden" id="_wpnonce" name="_wpnonce" value="<?php echo $nonce; ?>" />
@@ -730,14 +737,17 @@ class Beautiful_custom_fields_admin {
 		
 		</div> <!-- metabox-holder -->
 		
+		<?php endif; ?>
+		
 		<div id="form-box" class="metabox-holder disabled-metabox-holder-disabled">
 		
 			<div class="postbox">
 		
 				<h3><span>New Box</span></h3>
 				<div class="inside">	
-				
-					<p>We have to insert some kind of box here.</p>
+					<?php if (is_array($bcf_boxs) && empty($bcf_boxs)) : ?>
+					<p>To add fields, you have to create a box.</p>
+					<?php endif; ?>
 					
 					<form action="<?php echo $action_url; ?>" method="post">
 						<?php if ($_REQUEST['action'] == 'edit_box') : ?>

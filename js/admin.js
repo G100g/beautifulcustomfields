@@ -75,7 +75,7 @@
 		$( "table.box-fields" ).sortable({
 					connectWith: ".connectedSortable",
 					handle: 'td.dd-holder',
-					items: 'tr',
+					items: 'tr.field',
 					update: function(event, ui) { 
 					
 						update_fields_positions()
