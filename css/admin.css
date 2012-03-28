@@ -1,0 +1,60 @@
+#form-field, #form-box {
+	float: left;
+}
+
+#form-field {
+	
+	width: 550px;
+	margin-right: 10px;
+}
+
+#form-box {
+	width: 300px;
+}
+	#form-box input.regular-text {
+		width: 15em;
+	}
+
+
+#row_options {
+	display: none;
+}
+
+td.dd-holder {
+	cursor: move;
+	color: #C9C9C9;
+	font-size: 1.4em;
+	line-height: .45em;
+	padding: 10px 10px 0;
+	text-align: center;
+	
+}
+
+input[name="nf_sort"] {
+	width: 30px;
+}
+
+.box-header {
+	
+	
+}
+	.box-header h3 {
+		float: left;
+	}
+
+	.box-header .box-actions {
+		float: right;
+		margin: 1em 0;
+	}
+		.box-header .box-actions a {			
+			padding: 1px 2px;
+			border-bottom-width: 1px;
+			border-bottom-style: solid;
+			text-decoration: none;
+		}
+		.box-header .box-actions .submitdelete {
+			color: #F00;
+		}
+			.box-header .box-actions .submitdelete:hover {
+				color: #FFF;
+			}
