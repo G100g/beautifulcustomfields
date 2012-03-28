@@ -639,8 +639,6 @@ class Beautiful_custom_fields {
 		
 		$boxs_to_show = array();
 		
-		//foreach ($option_boxs as $box_id => $box) {
-		
 		foreach ($option_fields as $box_id => $fields) {
 		
 			if (is_array($fields)) {
