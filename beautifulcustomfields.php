@@ -645,7 +645,6 @@ class Beautiful_custom_fields {
 		
 				foreach ($fields as $field_name => $field) {
 				
-					//if (is_array($field->custom_post_types)) {
 					if (is_array($field->custom_post_types)) {
 					
 						if (
