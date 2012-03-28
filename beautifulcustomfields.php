@@ -647,9 +647,21 @@ class Beautiful_custom_fields {
 		
 				foreach ($fields as $field_name => $field) {
 				
+					//if (is_array($field->custom_post_types)) {
 					if (is_array($field->custom_post_types)) {
 					
-						if (in_array($post_type, $field->custom_post_types)) {
+						if (
+							in_array($post_type, $field->custom_post_types)
+							) {
+							$boxs_to_show[$box_id] = $option_boxs[$box_id];
+							break;
+						}
+					
+					} else if ( is_array($field->posts_ids)) {
+						
+						if (
+							in_array($post->ID, $field->posts_ids)
+							) {
 							$boxs_to_show[$box_id] = $option_boxs[$box_id];
 							break;
 						}
