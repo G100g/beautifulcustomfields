@@ -460,13 +460,31 @@ class Beautiful_custom_fields_admin {
 	$actionurl = $_SERVER['REQUEST_URI'];
 	$plainurl = 'admin.php?page=bcf_admin.php';
 	
-	
-	
 	$bcf_fields = get_option('bcf_fields');
 	$bcf_fields = is_string($bcf_fields) ? unserialize( $bcf_fields ) : $bcf_fields;
 	
 	$bcf_boxs = get_option('bcf_boxs');
+	
+	//Se non esiste un box ne creo uno
+	if (!is_string($bcf_boxs)) {
+	
+		$tmp_bcf_boxs[0] = array(
+  						'title' => "Options",
+  						'context' => 'normal',
+  						'priority' => 'high'
+  					);
+	
+		//Salvo i dati
+		$bcf_boxs = serialize($tmp_bcf_boxs);
+		
+		update_option( 'bcf_boxs', $bcf_boxs );
+	
+	}
+	
 	$bcf_boxs = is_string($bcf_boxs) ? unserialize( $bcf_boxs ) : $bcf_boxs;
+	
+	
+	
 		
 	//Ritrovo le categorie e creo un checkbox
 	//$post_categories = get_categories(array('hide_empty'=> false));
