@@ -27,7 +27,11 @@ class Beautiful_custom_fields_types {
 	
 		//Inizializzo il campo
 		$class_name = "bcf_".$field->type;
+<<<<<<< HEAD
 		if ( !class_exists( $class_name ,false) ) {
+=======
+		if ( !class_exists( $class_name ) ) {
+>>>>>>> origin/master
 			$class_name = "bcf_text";
 		}
 		
@@ -57,7 +61,11 @@ class Beautiful_custom_fields {
 	function __construct() {
 	
 		//$this->fields_types = new Beautiful_custom_fields_types();
+<<<<<<< HEAD
 		//$this->init_options();
+=======
+		$this->init_options();
+>>>>>>> origin/master
 	}
 	
 	/**
@@ -71,7 +79,11 @@ class Beautiful_custom_fields {
 		//Inizializzo il campo
 		$class_name = "bcf_".(is_object($field) ? $field->type : $field);
 		
+<<<<<<< HEAD
 		if ( !class_exists( $class_name ,false) ) {
+=======
+		if ( !class_exists( $class_name ) ) {
+>>>>>>> origin/master
 			$class_name = "bcf_text";
 		}
 		//$f = new $class_name($this->multilanguage);
@@ -143,7 +155,11 @@ class Beautiful_custom_fields {
 			
 				STAICO
 			$class_name = "bcf_".$cf_name;
+<<<<<<< HEAD
 			if ( class_exists( $class_name ,false) ) {								
+=======
+			if ( class_exists( $class_name ) ) {								
+>>>>>>> origin/master
 				if (method_exists($class_name, 'init') ) {
 					if(is_callable(array($class_name,"init"))) {
 						call_user_func(array($class_name, 'init'));
@@ -312,7 +328,10 @@ class Beautiful_custom_fields {
 				$('.postbox tr'+box_class+' :input').attr('disabled', false);
 				
 				//Attivo quelli che devono essere mostrati a priori
+<<<<<<< HEAD
 				
+=======
+>>>>>>> origin/master
 				for (var i in bc_fields_names) {
 					//box_class += bc_fields_names[i];				
 					$('.postbox tr.'+bc_fields_names).show();	
@@ -449,7 +468,11 @@ class Beautiful_custom_fields {
 			
 			//Depth
 			$('select#parent_id').change( function () {
+<<<<<<< HEAD
 			//$('#in-category-<?php //echo $k; ?>').click( function () {
+=======
+			//$('#in-category-<?php echo $k; ?>').click( function () {
+>>>>>>> origin/master
 				var id = $(':selected', this).attr('class');
 				check_parent(id);	
 			
@@ -477,7 +500,11 @@ class Beautiful_custom_fields {
 			}
 			
 			$('select#page_template').change( function () {
+<<<<<<< HEAD
 			//$('#in-category-<?php //echo $k; ?>').click( function () {
+=======
+			//$('#in-category-<?php echo $k; ?>').click( function () {
+>>>>>>> origin/master
 				var id = $(':selected', this).val();
 				check_template(id);	
 			
@@ -599,7 +626,11 @@ class Beautiful_custom_fields {
 			
 			//Inizializzo l'oggetto ed eseguo il codice
 			$class_name = "bcf_".$cf_name;
+<<<<<<< HEAD
 			if ( class_exists( $class_name ,false) ) {
+=======
+			if ( class_exists( $class_name ) ) {
+>>>>>>> origin/master
 				
 				$f = new $class_name();				
 				if (method_exists($f, 'html_header') ) {
@@ -955,7 +986,11 @@ class Beautiful_custom_fields {
 				$widget->index = time()+$i;				
 			
 				//Controllo pe ril multilingua
+<<<<<<< HEAD
 				if ($field->multilanguage == 1 && $this->check_multilanguage()) {
+=======
+				if ($field->multilanguage == 1) {
+>>>>>>> origin/master
 					
 					//Mostro il form per le varie lingue
 					$pm_lang = qtrans_split($pm);
@@ -1003,6 +1038,7 @@ class Beautiful_custom_fields {
 	
 		global $post;
 
+<<<<<<< HEAD
 		//Prevent BULK
 		
 		if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'duplicate_post_save_as_new_post')
@@ -1014,11 +1050,19 @@ class Beautiful_custom_fields {
 			return $post_id;
         
 		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || defined('DOING_AJAX') && DOING_AJAX)
+=======
+
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+>>>>>>> origin/master
 		        return $post_id;
 
 		if (wp_is_post_revision($post_id)) return;
 
+<<<<<<< HEAD
 		//$this->check_multilanguage();
+=======
+		$this->check_multilanguage();
+>>>>>>> origin/master
 		
 //		echo $post_id . "<br />";
 		
@@ -1079,7 +1123,11 @@ class Beautiful_custom_fields {
 							//Inizializzo il campo
 							$class_name = "bcf_".$field->type;
 							
+<<<<<<< HEAD
 							if ( class_exists( $class_name ,false) ) {
+=======
+							if ( class_exists( $class_name ) ) {
+>>>>>>> origin/master
 								
 								//$f = new $class_name($this->multilanguage);
 								$f = new $class_name();
@@ -1089,6 +1137,7 @@ class Beautiful_custom_fields {
 								$name = "bcf_" . $cf_name;
 								$save_value = "";						
 								
+<<<<<<< HEAD
 								if (isset($_REQUEST[$name])) {
 									$value = $_REQUEST[$name];
 								} else {
@@ -1101,6 +1150,14 @@ class Beautiful_custom_fields {
 								if ($field->multiple == 1) {
 										
 										/*
+=======
+								$value = $_REQUEST[$name];
+								
+	
+							
+								if ($field->multiple == 1) {
+									
+>>>>>>> origin/master
 										if ($field->multilanguage == 1) {
 											
 											//becco le lingue disponibili
@@ -1127,7 +1184,11 @@ class Beautiful_custom_fields {
 											}
 											
 										} else {
+<<<<<<< HEAD
 										*/
+=======
+										
+>>>>>>> origin/master
 											$save_value = array();
 											if (!is_array($value)) {
 												$value = array();
@@ -1138,6 +1199,7 @@ class Beautiful_custom_fields {
 											
 											}
 											
+<<<<<<< HEAD
 										//}
 										
 								} else {
@@ -1146,6 +1208,12 @@ class Beautiful_custom_fields {
 
 								
 									/*
+=======
+										}
+										
+								} else {
+								
+>>>>>>> origin/master
 									if ($field->multilanguage == 1) {
 										
 										//becco le lingue disponibili
@@ -1165,10 +1233,17 @@ class Beautiful_custom_fields {
 										}
 										
 									} else {
+<<<<<<< HEAD
 									*/
 										$save_value = $f->save_field($field, $value, $name);	
 									
 									//}
+=======
+								
+										$save_value = $f->save_field($field, $value, $name);	
+									
+									}
+>>>>>>> origin/master
 								}
 							
 								//Se il campo è multimplo salvo i vari valori
@@ -1190,10 +1265,14 @@ class Beautiful_custom_fields {
 									}
 								
 								} else {
+<<<<<<< HEAD
 								
 									//var_dump($save_value);
 									//var_dump($cf_name);
 								
+=======
+	
+>>>>>>> origin/master
 									update_post_meta($post_id, $cf_name, $save_value);
 								
 								}
@@ -1373,10 +1452,17 @@ function init_bcf() {
 	//Init Admin Option Page
 	$bcf_admin = new Beautiful_custom_fields_admin($bcf);
 	
+<<<<<<< HEAD
 	
 	//add_action('admin_init', array(&$bcf, 'attach_meta_box'), 10); //backwards compatible
 	
 	
+=======
+	add_action('add_meta_boxes', array(&$bcf, 'attach_meta_box'), 10);
+	add_action('admin_init', array(&$bcf, 'attach_meta_box'), 10); //backwards compatible
+	
+	add_action( "admin_print_scripts", array(&$bcf, 'add_javascript'), 10);
+>>>>>>> origin/master
 	
 	if ( isset($_REQUEST["action"]) && $_REQUEST["action"] != 'inline-save' && $_REQUEST["action"] != 'autosave' && is_admin()) {
 		add_action('save_post', array(&$bcf, 'save_custom_fields'));
@@ -1388,13 +1474,20 @@ function init_bcf() {
 	if ( ((strpos($_SERVER['REQUEST_URI'], 'post-new.php') || strpos($_SERVER['REQUEST_URI'], 'post.php')) !== FALSE) ) {
 		//add_action('admin_head', array(&$bcf, 'set_header'));
 		
+<<<<<<< HEAD
 		add_action('add_meta_boxes', array(&$bcf, 'attach_meta_box'), 10);
 		add_action( "admin_print_scripts", array(&$bcf, 'add_javascript'), 10);
+=======
+>>>>>>> origin/master
 
 		add_action('admin_footer', array(&$bcf, 'set_header'));
 	}
 	
+<<<<<<< HEAD
 	add_action('admin_init',array(&$bcf,'init_options'));
+=======
+	//add_action('admin_init',array(&$bcf,'init_options'));
+>>>>>>> origin/master
 	
 	//AJAX
 	add_action('wp_ajax_bcf_get_new_field', array(&$bcf, 'ajax_bcf_get_new_field'), 120);

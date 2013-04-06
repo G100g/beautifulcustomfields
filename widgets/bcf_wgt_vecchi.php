@@ -435,7 +435,11 @@ function bcf_suggest_source() {
 	//Becco i dati del campo detto 
 	$class_name = "bcf_suggest";
 	
+<<<<<<< HEAD
 	if ( class_exists( $class_name ,false) ) {
+=======
+	if ( class_exists( $class_name ) ) {
+>>>>>>> origin/master
 		$f = new $class_name();
 		if (method_exists($f, '_get_options') ) {
 			$options = $f->_get_options($bcf_field);

@@ -36,6 +36,7 @@ class bcf_multicheckbox extends bcf_multiselect {
 		if (!is_array($selected_value)) $selected_value = array($selected_value);
 		
 			foreach($values as $value) :
+<<<<<<< HEAD
 
 				if (strpos($value, "[::]")) {
 					$value = explode("[::]", $value);
@@ -43,6 +44,14 @@ class bcf_multicheckbox extends bcf_multiselect {
 					$value = array($value, $value);
 				}
 
+=======
+			
+				if (strpos($value, "::")) {
+					$value = explode("::", $value);
+				} else {
+					$value = array($value, $value);
+				}
+>>>>>>> origin/master
 	?>		
 				<label><input type="checkbox" id="<?php echo $_name; ?>_<?php echo $value[0]; ?>" name="<?php echo $_name; ?>[]" class="<?php echo $_class; ?>" value="<?php echo $value[0]; ?>" <?php echo (in_array($value[0], $selected_value)  ? 'checked="checked"' : ''  );?> /> <?php echo $value[1]; ?></label>
 	<?php		

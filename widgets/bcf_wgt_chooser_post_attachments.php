@@ -30,6 +30,7 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 		
 		}
 		
+<<<<<<< HEAD
 		
 		public function html_header() {
 			parent::html_header();
@@ -47,6 +48,8 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 		<?php	
 		}
 		
+=======
+>>>>>>> origin/master
 		public function extend_ajax_var($ajax_var) {
 			
 			global $post;			
@@ -56,6 +59,7 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 		
 		public function options_attachments($options, $value) {
 
+<<<<<<< HEAD
 			global $post;
 			
 			if (isset($_REQUEST["post_id"])) {
@@ -64,6 +68,9 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 				$post_id = $post->ID;
 			} 
 			
+=======
+			$post_id = $_REQUEST["post_id"];
+>>>>>>> origin/master
 			$values = $this->get_attachment($post_id, $value, $options);
 			
 			return $values;
@@ -77,6 +84,7 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 			$options = $options[0];
 			
 			//if ($options == '*') $options = '';
+<<<<<<< HEAD
 			if (strpos( $value, ',') !== FALSE) {
 				$value = explode(",", $value);
 				$value = array_flip($value);		
@@ -93,12 +101,28 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 			);
 			$a = get_posts($args);
 			
+=======
+			$value = explode(",", $value);
+			$value = array_flip($value);		
+			
+			$args = array(
+				'post_status' => null,
+				'post_type' => 'attachment',
+				'post_mime_type' => $options,
+				'post_parent' => $post_id,
+				'order_by' => 'title',
+				'order' => 'asc',
+			);
+			$a = get_posts($args);
+
+>>>>>>> origin/master
 			if ($a) {
 					foreach($a as $attachment) {
 				
 					//Becco il thumb del file
 					$thumb = wp_get_attachment_image( $attachment->ID, array(46, 46), TRUE  );
 					
+<<<<<<< HEAD
 					//if (!is_array($value)) {
 						$post_attachments[] = $attachment->ID."[::]" . $thumb  . get_the_title($attachment->ID);
 						/*
@@ -106,6 +130,13 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 					
 						$post_attachments[ $value[$attachment->ID] ] = $attachment->ID."[::]" . $thumb  . get_the_title($attachment->ID) . " | <a href=\"". get_permalink($attachment->ID)."\" target=\"_blank\" title=\"#". $attachment->ID."\">view</a>";
 					}*/
+=======
+					if (!is_array($value)) {
+						$post_attachments[] = $attachment->ID."[::]" . $thumb  . get_the_title($attachment->ID);
+					} else {
+						$post_attachments[ $value[$attachment->ID] ] = $attachment->ID."[::]" . $thumb  . get_the_title($attachment->ID) . " | <a href=\"". get_permalink($attachment->ID)."\" target=\"_blank\" title=\"#". $attachment->ID."\">view</a>";
+					}
+>>>>>>> origin/master
 				}
 			}
 			

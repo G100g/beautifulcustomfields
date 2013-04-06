@@ -13,11 +13,16 @@ class Beautiful_custom_fields_admin {
 	
 		$this->bcf = $_bcf;
 		
+<<<<<<< HEAD
 		//add_action( "admin_print_styles", array(&$this, 'add_style'), 10);
 		//add_action( "admin_print_scripts", array(&$this, 'add_javascript'), 10);
 		add_action( "admin_enqueue_scripts", array(&$this, 'add_style'), 10);
 		add_action( "admin_enqueue_scripts", array(&$this, 'add_javascript'), 10);
 		
+=======
+		add_action( "admin_print_styles", array(&$this, 'add_style'), 10);
+		add_action( "admin_print_scripts", array(&$this, 'add_javascript'), 10);
+>>>>>>> origin/master
 		
 		add_action('admin_menu', array(&$this, 'admin_menu'), 10);
 	
@@ -57,7 +62,11 @@ class Beautiful_custom_fields_admin {
 	
 	
 		//Aggiungo la pagina ai settings
+<<<<<<< HEAD
 		add_options_page('Beautiful Custom Fields', 'Beautiful Custom Fields', 'update_core', basename(__FILE__), array(&$this, 'admin_page') );
+=======
+		add_options_page('Beautiful Custom Fields', 'Beautiful Custom Fields', 8, basename(__FILE__), array(&$this, 'admin_page') );
+>>>>>>> origin/master
 		//add_menu_page('Supple Forms', 'Supple Forms', 9, basename(__FILE__), array(&$suppleForms, 'loadAdminPage'));
 	
 	}	
@@ -140,6 +149,7 @@ class Beautiful_custom_fields_admin {
 		
 		$msg = array();
 
+<<<<<<< HEAD
 	//Imposto i valori di default
 		$nf_name = "";
 		$nf_cf_name = "";
@@ -161,6 +171,8 @@ class Beautiful_custom_fields_admin {
 		$box_context = 0;
 		$box_priority = 0;
 
+=======
+>>>>>>> origin/master
 	// If form was submitted
 	if (isset($_REQUEST['action'])) {			
 		  	
@@ -330,6 +342,7 @@ class Beautiful_custom_fields_admin {
 			  		case 'add':
 			  		
 			  			$form_errors = FALSE;
+<<<<<<< HEAD
 			  			
 			  			//Ritrovo i campi inviati
 			  			
@@ -370,14 +383,29 @@ class Beautiful_custom_fields_admin {
 				  			//Aggiungo il campo all'array
 				  			//$new_field_obj = $this->create_field( $_REQUEST['nf_name'], $_REQUEST['nf_cf_name'], $_REQUEST['nf_type_options'], $_REQUEST['nf_taxonomy'], $_REQUEST['nf_posts_ids'], $_REQUEST['nf_custom_post_types'], $_REQUEST['nf_type'], $_REQUEST['nf_sort'], $_REQUEST['nf_multiple'], $_REQUEST['nf_multilanguage'], $_REQUEST['nf_depth'], $_REQUEST['nf_page_template_ids'] );				  			
 				  			$new_field_obj = $this->create_field( $nf_name, $nf_cf_name, $nf_type_options, $nf_taxonomy, $nf_posts_ids, $nf_custom_post_types, $nf_type, $nf_sort, $nf_multiple, $nf_multilanguage, $nf_depth, $nf_page_template_ids );
+=======
+			  		
+			  			if (trim($_REQUEST['nf_name']) != '' && trim($_REQUEST['nf_cf_name']) != '' && ( !empty($_REQUEST['nf_taxonomy']) || !empty($_REQUEST['nf_posts_ids']) || !empty($_REQUEST['nf_custom_post_types']) ) ) {
+				  			
+				  			if ($_REQUEST['nf_sort'] == '') {
+				  				$_REQUEST['nf_sort'] = 0;
+				  			}
+				  			
+				  			//Aggiungo il campo all'array
+				  			$new_field_obj = $this->create_field( $_REQUEST['nf_name'], $_REQUEST['nf_cf_name'], $_REQUEST['nf_type_options'], $_REQUEST['nf_taxonomy'], $_REQUEST['nf_posts_ids'], $_REQUEST['nf_custom_post_types'], $_REQUEST['nf_type'], $_REQUEST['nf_sort'], $_REQUEST['nf_multiple'], $_REQUEST['nf_multilanguage'], $_REQUEST['nf_depth'], $_REQUEST['nf_page_template_ids'] );
+>>>>>>> origin/master
 				  			
 				  			if ( $new_field_obj ) {
 				  				
 				  				//Ritrovo i valori
 				  				$tmp_bcf_fields = unserialize( get_option('bcf_fields') );
 				  				
+<<<<<<< HEAD
 				  				//$cf_key_value = $this->clean_custom_field_value($_REQUEST['nf_cf_name']);
 				  				$cf_key_value = $this->clean_custom_field_value($nf_cf_name);
+=======
+				  				$cf_key_value = $this->clean_custom_field_value($_REQUEST['nf_cf_name']);
+>>>>>>> origin/master
 				  				
 				  				//Controllo se esiste il campo
 				  				
@@ -391,6 +419,7 @@ class Beautiful_custom_fields_admin {
 				  				
 				  				} else {
 				  				
+<<<<<<< HEAD
 					  				//$tmp_bcf_fields[$_REQUEST['nf_box']][ $cf_key_value ] = $new_field_obj;
 					  				$tmp_bcf_fields[$nf_box][ $cf_key_value ] = $new_field_obj;
 					  				
@@ -398,6 +427,13 @@ class Beautiful_custom_fields_admin {
 					  				
 					  				//if (isset($_REQUEST['old_nf_box']) && $_REQUEST['old_nf_box'] != $_REQUEST['nf_box']) {				  				
 					  				if (isset($_REQUEST['old_nf_box']) && $_REQUEST['old_nf_box'] != $nf_box) {				  				
+=======
+					  				$tmp_bcf_fields[$_REQUEST['nf_box']][ $cf_key_value ] = $new_field_obj;
+					  				
+					  				//Se è cambiato il box elimino il campo dal vecchio box
+					  				
+					  				if (isset($_REQUEST['old_nf_box']) && $_REQUEST['old_nf_box'] != $_REQUEST['nf_box']) {				  				
+>>>>>>> origin/master
 					  					unset($tmp_bcf_fields[$_REQUEST['old_nf_box']]);
 					  				}				  				
 					  				
@@ -415,9 +451,14 @@ class Beautiful_custom_fields_admin {
 			  			
 			  			}
 			  			
+<<<<<<< HEAD
 			  			/*
 			  			if ($form_errors) {
 			  			
+=======
+			  			if ($form_errors) {
+			  				
+>>>>>>> origin/master
 			  				$nf_name = $_REQUEST['nf_name'];
 			  				$nf_cf_name = trim($_REQUEST['nf_cf_name']);
 			  				$nf_type_options = trim($_REQUEST['nf_type_options']);
@@ -432,8 +473,15 @@ class Beautiful_custom_fields_admin {
 			  				$nf_page_template_ids = $_REQUEST['nf_page_template_ids'];
 			  				$nf_box = $_REQUEST['nf_box'];
 			  				
+<<<<<<< HEAD
 			  			}
 			  			*/
+=======
+			  			
+			  				
+			  			
+			  			}
+>>>>>>> origin/master
 			  		
 			  		break;
 			  		
@@ -511,10 +559,17 @@ class Beautiful_custom_fields_admin {
 		   _e('<div id="message" class="updated fade"><p>' . $msg_status . '</p></div>');
 		   */
 		
+<<<<<<< HEAD
 	} 
 
 	$nonce = wp_create_nonce('bcf');
 	$action_url = $_SERVER['REQUEST_URI'];	
+=======
+	}
+
+	$nonce = wp_create_nonce('bcf');
+	$actionurl = $_SERVER['REQUEST_URI'];
+>>>>>>> origin/master
 	$plainurl = 'admin.php?page=bcf_admin.php';
 	
 	$bcf_fields = get_option('bcf_fields');
@@ -796,7 +851,11 @@ class Beautiful_custom_fields_admin {
 		</tbody>
 		
 		</table>
+<<<<<<< HEAD
 		<?php if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'edit') : ?>
+=======
+		<?php if ($_REQUEST['action'] == 'edit') : ?>
+>>>>>>> origin/master
 		<input type="hidden" name="old_nf_box" value="<?php echo $nf_box; ?>" />
 		<input type="hidden" name="old_nf_cf_name" value="<?php echo $nf_cf_name; ?>" />
 		
@@ -825,7 +884,11 @@ class Beautiful_custom_fields_admin {
 					<?php endif; ?>
 					
 					<form action="<?php echo $action_url; ?>" method="post">
+<<<<<<< HEAD
 						<?php if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'edit_box') : ?>
+=======
+						<?php if ($_REQUEST['action'] == 'edit_box') : ?>
+>>>>>>> origin/master
 						<input type="hidden" name="action" value="save_box" />
 						<input type="hidden" name="box_index" value="<?php echo $box_index; ?>" />
 						
@@ -869,7 +932,11 @@ class Beautiful_custom_fields_admin {
 							</tbody>
 						
 						</table>
+<<<<<<< HEAD
 						<?php if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'edit_box') : ?>
+=======
+						<?php if ($_REQUEST['action'] == 'edit_box') : ?>
+>>>>>>> origin/master
 						<p class="submit"><input type="submit" value="Create New Box" class="button-highlighted button" name="create_box"/> <input type="submit" value="Save" class="button-primary" name="Submit"/></p>
 						<?php else: ?>
 						<p class="submit"><input type="submit" value="Create" class="button-primary" name="Submit"/></p>
@@ -1048,7 +1115,11 @@ class Beautiful_custom_fields_admin {
 		
 		$class_name = "bcf_".$widget_name;
 
+<<<<<<< HEAD
 		if ( class_exists( $class_name ,false) ) {				
+=======
+		if ( class_exists( $class_name ) ) {				
+>>>>>>> origin/master
 
 			if (method_exists($class_name, 'option_init') ) {
 				if(is_callable(array($class_name,"option_init"))) {

@@ -171,7 +171,10 @@ class bcf_select extends bcf_text {
 	public function _get_options($field, $value = "") {				
 
 		$values = explode(":##:",$field->type_options);
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 		//Applico il filtro	
 	
 		//echo ".... " . $field->type . "....<br>";
