@@ -85,11 +85,7 @@ abstract class bcf_widget {
 			//$res = '<input ' . ( !$active ? ' disabled="disabled"' : ''  ) .' type="text" name="'.$id.$ml.'" class="full '.$id.$class.'" value="'.($value !== false ? htmlentities($value, null, get_option('blog_charset')) : '').'"/>';
 		//}
 
-<<<<<<< HEAD
 		$value = ($value !== false ? htmlentities($value, ENT_QUOTES, get_option('blog_charset')) : '');
-=======
-		$value = ($value !== false ? htmlentities($value, null, get_option('blog_charset')) : '');
->>>>>>> origin/master
 		
 ?>		
 		<input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" class="full <?php echo $id. " " .$class; ?>" <?php echo ( !$active ? ' disabled="disabled"' : ''  ); ?> />
