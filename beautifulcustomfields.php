@@ -27,7 +27,7 @@ class Beautiful_custom_fields_types {
 	
 		//Inizializzo il campo
 		$class_name = "bcf_".$field->type;
-		if ( !class_exists( $class_name ) ) {
+		if ( !class_exists( $class_name ,false) ) {
 			$class_name = "bcf_text";
 		}
 		
@@ -57,7 +57,7 @@ class Beautiful_custom_fields {
 	function __construct() {
 	
 		//$this->fields_types = new Beautiful_custom_fields_types();
-		$this->init_options();
+		//$this->init_options();
 	}
 	
 	/**
@@ -71,7 +71,7 @@ class Beautiful_custom_fields {
 		//Inizializzo il campo
 		$class_name = "bcf_".(is_object($field) ? $field->type : $field);
 		
-		if ( !class_exists( $class_name ) ) {
+		if ( !class_exists( $class_name ,false) ) {
 			$class_name = "bcf_text";
 		}
 		//$f = new $class_name($this->multilanguage);
@@ -143,7 +143,7 @@ class Beautiful_custom_fields {
 			
 				STAICO
 			$class_name = "bcf_".$cf_name;
-			if ( class_exists( $class_name ) ) {								
+			if ( class_exists( $class_name ,false) ) {								
 				if (method_exists($class_name, 'init') ) {
 					if(is_callable(array($class_name,"init"))) {
 						call_user_func(array($class_name, 'init'));
@@ -312,6 +312,7 @@ class Beautiful_custom_fields {
 				$('.postbox tr'+box_class+' :input').attr('disabled', false);
 				
 				//Attivo quelli che devono essere mostrati a priori
+				
 				for (var i in bc_fields_names) {
 					//box_class += bc_fields_names[i];				
 					$('.postbox tr.'+bc_fields_names).show();	
@@ -448,7 +449,7 @@ class Beautiful_custom_fields {
 			
 			//Depth
 			$('select#parent_id').change( function () {
-			//$('#in-category-<?php echo $k; ?>').click( function () {
+			//$('#in-category-<?php //echo $k; ?>').click( function () {
 				var id = $(':selected', this).attr('class');
 				check_parent(id);	
 			
@@ -476,7 +477,7 @@ class Beautiful_custom_fields {
 			}
 			
 			$('select#page_template').change( function () {
-			//$('#in-category-<?php echo $k; ?>').click( function () {
+			//$('#in-category-<?php //echo $k; ?>').click( function () {
 				var id = $(':selected', this).val();
 				check_template(id);	
 			
@@ -598,7 +599,7 @@ class Beautiful_custom_fields {
 			
 			//Inizializzo l'oggetto ed eseguo il codice
 			$class_name = "bcf_".$cf_name;
-			if ( class_exists( $class_name ) ) {
+			if ( class_exists( $class_name ,false) ) {
 				
 				$f = new $class_name();				
 				if (method_exists($f, 'html_header') ) {
@@ -639,8 +640,6 @@ class Beautiful_custom_fields {
 		
 		$boxs_to_show = array();
 		
-		//foreach ($option_boxs as $box_id => $box) {
-		
 		foreach ($option_fields as $box_id => $fields) {
 		
 			if (is_array($fields)) {
@@ -649,7 +648,18 @@ class Beautiful_custom_fields {
 				
 					if (is_array($field->custom_post_types)) {
 					
-						if (in_array($post_type, $field->custom_post_types)) {
+						if (
+							in_array($post_type, $field->custom_post_types)
+							) {
+							$boxs_to_show[$box_id] = $option_boxs[$box_id];
+							break;
+						}
+					
+					} else if ( is_array($field->posts_ids)) {
+						
+						if (
+							in_array($post->ID, $field->posts_ids)
+							) {
 							$boxs_to_show[$box_id] = $option_boxs[$box_id];
 							break;
 						}
@@ -945,7 +955,7 @@ class Beautiful_custom_fields {
 				$widget->index = time()+$i;				
 			
 				//Controllo pe ril multilingua
-				if ($field->multilanguage == 1) {
+				if ($field->multilanguage == 1 && $this->check_multilanguage()) {
 					
 					//Mostro il form per le varie lingue
 					$pm_lang = qtrans_split($pm);
@@ -993,13 +1003,22 @@ class Beautiful_custom_fields {
 	
 		global $post;
 
-
-		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+		//Prevent BULK
+		
+		if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'duplicate_post_save_as_new_post')
+			return $post_id;
+		if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'duplicate_post_save_as_new_post_draft')
+			return $post_id;
+			
+		if (isset($_REQUEST['bulk_edit']))
+			return $post_id;
+        
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || defined('DOING_AJAX') && DOING_AJAX)
 		        return $post_id;
 
 		if (wp_is_post_revision($post_id)) return;
 
-		$this->check_multilanguage();
+		//$this->check_multilanguage();
 		
 //		echo $post_id . "<br />";
 		
@@ -1017,63 +1036,116 @@ class Beautiful_custom_fields {
 		//$real_id =  wp_is_post_revision($post_id);
 		
 		//if ($post_id == $real_id) {
-
 			//Ritrovo i campi da salvare
 			foreach ( $bcf_fields as $box_id => $fields ) {
-				foreach ( $fields as $cf_name => $field ) {
-
-					//Se fa parte del post lo salvo
-					//$to_save = false;
-					
-					/*				
-					if (get_post_type( $post_id ) == 'post') {
-						
-						//echo "SALVO ";
-						//var_dump($field->categories);
-					
-						if ( in_category( $field->categories, $post_id )) {
+			
+				if (is_array($fields)) {
+			
+					foreach ( $fields as $cf_name => $field ) {
 	
-							$to_save = true;	
-						}
-					} else if (get_post_type( $post_id ) == 'page') {
-						if ( in_array( $post_id, (is_array($field->pages) ? $field->pages : array() ) ) ) {
-							$to_save = true;
-						}
-					} else {
-						if ( in_array( get_post_type( $post_id ), (is_array($field->custom_post_types) ? $field->custom_post_types : array() ) ) ) {
-							$to_save = true;
-						}
-					}
-					*/
-					
-					
-					
-					//var_dump($cf_value, $to_save);		
-					//$bcf_fields
-					
-					//if ($to_save) {
-					
-						//$value = $_REQUEST["bfc_".$cf_value];
+						//Se fa parte del post lo salvo
+						//$to_save = false;
 						
-						//Inizializzo il campo
-						$class_name = "bcf_".$field->type;
+						/*				
+						if (get_post_type( $post_id ) == 'post') {
+							
+							//echo "SALVO ";
+							//var_dump($field->categories);
 						
-						if ( class_exists( $class_name ) ) {
-							
-							//$f = new $class_name($this->multilanguage);
-							$f = new $class_name();
-							//$value = $f->save_field($field, $cf_name, $this->multilanguage);
-							
-							//Nome del campo inviato
-							$name = "bcf_" . $cf_name;
-							$save_value = "";						
-							
-							$value = $_REQUEST[$name];
-							
-
+							if ( in_category( $field->categories, $post_id )) {
+		
+								$to_save = true;	
+							}
+						} else if (get_post_type( $post_id ) == 'page') {
+							if ( in_array( $post_id, (is_array($field->pages) ? $field->pages : array() ) ) ) {
+								$to_save = true;
+							}
+						} else {
+							if ( in_array( get_post_type( $post_id ), (is_array($field->custom_post_types) ? $field->custom_post_types : array() ) ) ) {
+								$to_save = true;
+							}
+						}
+						*/
 						
-							if ($field->multiple == 1) {
+						
+						
+						//var_dump($cf_value, $to_save);		
+						//$bcf_fields
+						
+						//if ($to_save) {
+						
+							//$value = $_REQUEST["bfc_".$cf_value];
+							
+							//Inizializzo il campo
+							$class_name = "bcf_".$field->type;
+							
+							if ( class_exists( $class_name ,false) ) {
 								
+								//$f = new $class_name($this->multilanguage);
+								$f = new $class_name();
+								//$value = $f->save_field($field, $cf_name, $this->multilanguage);
+								
+								//Nome del campo inviato
+								$name = "bcf_" . $cf_name;
+								$save_value = "";						
+								
+								if (isset($_REQUEST[$name])) {
+									$value = $_REQUEST[$name];
+								} else {
+									$value = "";
+								}
+							
+							
+							
+							
+								if ($field->multiple == 1) {
+										
+										/*
+										if ($field->multilanguage == 1) {
+											
+											//becco le lingue disponibili
+											$pm_lang = $this->lang;
+											
+											if (is_array($pm_lang)) {
+											
+												//Becco i campi con la lingua indicata
+												foreach ($pm_lang as $l) {
+												
+													$qt_name = $name."_".$l;											
+													$value = $_REQUEST[$qt_name];
+													
+													//Otengo l'array con il valore
+													if (!is_array($value)) {
+														$value = array("");
+													}
+													foreach ($value as $k => $_value) {
+														$save_value[$k] .= "<!--:$l-->" . $f->save_field($field, $_value, $qt_name) . "<!--:-->";
+													}
+													
+												}
+												
+											}
+											
+										} else {
+										*/
+											$save_value = array();
+											if (!is_array($value)) {
+												$value = array();
+											}
+											foreach ($value as $_value) {
+										
+												$save_value[] = $f->save_field($field, $_value, $name);	
+											
+											}
+											
+										//}
+										
+								} else {
+								
+									
+
+								
+									/*
 									if ($field->multilanguage == 1) {
 										
 										//becco le lingue disponibili
@@ -1086,106 +1158,70 @@ class Beautiful_custom_fields {
 											
 												$qt_name = $name."_".$l;											
 												$value = $_REQUEST[$qt_name];
-												
-												//Otengo l'array con il valore
-												if (!is_array($value)) {
-													$value = array("");
-												}
-												foreach ($value as $k => $_value) {
-													$save_value[$k] .= "<!--:$l-->" . $f->save_field($field, $_value, $qt_name) . "<!--:-->";
-												}
+												$save_value .= "<!--:$l-->" . $f->save_field($field, $value, $qt_name) . "<!--:-->";
 												
 											}
 											
 										}
 										
 									} else {
+									*/
+										$save_value = $f->save_field($field, $value, $name);	
 									
-										$save_value = array();
-										if (!is_array($value)) {
-											$value = array();
-										}
-										foreach ($value as $_value) {
-									
-											$save_value[] = $f->save_field($field, $_value, $name);	
-										
-										}
-										
-									}
-									
-							} else {
-							
-								if ($field->multilanguage == 1) {
-									
-									//becco le lingue disponibili
-									$pm_lang = $this->lang;
-									
-									if (is_array($pm_lang)) {
-									
-										//Becco i campi con la lingua indicata
-										foreach ($pm_lang as $l) {
-										
-											$qt_name = $name."_".$l;											
-											$value = $_REQUEST[$qt_name];
-											$save_value .= "<!--:$l-->" . $f->save_field($field, $value, $qt_name) . "<!--:-->";
-											
-										}
-										
-									}
-									
-								} else {
-							
-									$save_value = $f->save_field($field, $value, $name);	
-								
+									//}
 								}
-							}
-						
-							//Se il campo è multimplo salvo i vari valori
 							
-							//Eseguo la funzione che processa il valore e mi restituisce il valore da salvare
-							//$value = $f->save_field($field, $cf_name, $this->multilanguage);
+								//Se il campo è multimplo salvo i vari valori
+								
+								//Eseguo la funzione che processa il valore e mi restituisce il valore da salvare
+								//$value = $f->save_field($field, $cf_name, $this->multilanguage);
+		
+								do_action('bcf_save_meta_'.$cf_name, $post_id, $save_value, $cf_name);
+								do_action('bcf_save_meta', $post_id, $save_value, $cf_name);						
 	
-							do_action('bcf_save_meta_'.$cf_name, $post_id, $save_value, $cf_name);
-							do_action('bcf_save_meta', $post_id, $save_value, $cf_name);						
-
-							if (is_array($save_value)) {
-							
-								//Cancello tutti le chiavi e le reinserisco
-								delete_post_meta($post_id, $cf_name);
+								if (is_array($save_value)) {
 								
-								foreach ($save_value as $v) {
-										
-									add_post_meta($post_id, $cf_name, $v);
+									//Cancello tutti le chiavi e le reinserisco
+									delete_post_meta($post_id, $cf_name);
+									
+									foreach ($save_value as $v) {
+											
+										add_post_meta($post_id, $cf_name, $v);
+									}
+								
+								} else {
+								
+									//var_dump($save_value);
+									//var_dump($cf_name);
+								
+									update_post_meta($post_id, $cf_name, $save_value);
+								
 								}
-							
-							} else {
-
-								update_post_meta($post_id, $cf_name, $save_value);
-							
+								
 							}
 							
-						}
-						
-						/*
-						
-						
-						//echo "SALVO ".$this->multilanguage;					
-						if ($this->multilanguage && $field->multilanguage == 1) {
-							//echo "SALVO ML";
-							//Riunisco il valore delle lingue
-							$lang = qtrans_getSortedLanguages();
+							/*
 							
-							$text = array();
-							foreach ($lang as $l) {
-								$text[$l] = $_REQUEST["bfc_".$cf_value."_".$l];
+							
+							//echo "SALVO ".$this->multilanguage;					
+							if ($this->multilanguage && $field->multilanguage == 1) {
+								//echo "SALVO ML";
+								//Riunisco il valore delle lingue
+								$lang = qtrans_getSortedLanguages();
+								
+								$text = array();
+								foreach ($lang as $l) {
+									$text[$l] = $_REQUEST["bfc_".$cf_value."_".$l];
+								}
+								$value = qtrans_join($text);
 							}
-							$value = qtrans_join($text);
-						}
-						*/
+							*/
+							
+							//update_post_meta($post_id, $cf_value, $value);
+						//}
 						
-						//update_post_meta($post_id, $cf_value, $value);
-					//}
-					
+					}
+				
 				}
 				
 			}
@@ -1337,10 +1373,10 @@ function init_bcf() {
 	//Init Admin Option Page
 	$bcf_admin = new Beautiful_custom_fields_admin($bcf);
 	
-	add_action('add_meta_boxes', array(&$bcf, 'attach_meta_box'), 10);
-	add_action('admin_init', array(&$bcf, 'attach_meta_box'), 10); //backwards compatible
 	
-	add_action( "admin_print_scripts", array(&$bcf, 'add_javascript'), 10);
+	//add_action('admin_init', array(&$bcf, 'attach_meta_box'), 10); //backwards compatible
+	
+	
 	
 	if ( isset($_REQUEST["action"]) && $_REQUEST["action"] != 'inline-save' && $_REQUEST["action"] != 'autosave' && is_admin()) {
 		add_action('save_post', array(&$bcf, 'save_custom_fields'));
@@ -1352,11 +1388,13 @@ function init_bcf() {
 	if ( ((strpos($_SERVER['REQUEST_URI'], 'post-new.php') || strpos($_SERVER['REQUEST_URI'], 'post.php')) !== FALSE) ) {
 		//add_action('admin_head', array(&$bcf, 'set_header'));
 		
+		add_action('add_meta_boxes', array(&$bcf, 'attach_meta_box'), 10);
+		add_action( "admin_print_scripts", array(&$bcf, 'add_javascript'), 10);
 
 		add_action('admin_footer', array(&$bcf, 'set_header'));
 	}
 	
-	//add_action('admin_init',array(&$bcf,'init_options'));
+	add_action('admin_init',array(&$bcf,'init_options'));
 	
 	//AJAX
 	add_action('wp_ajax_bcf_get_new_field', array(&$bcf, 'ajax_bcf_get_new_field'), 120);

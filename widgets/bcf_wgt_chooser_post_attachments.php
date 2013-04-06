@@ -30,6 +30,23 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 		
 		}
 		
+		
+		public function html_header() {
+			parent::html_header();
+			$widget_name = get_class($this);
+		?>	
+				<style>
+				.bcf_chooser_post_attachments img.attachment-46x46,
+				.token-input-dropdown-wp img.attachment-46x46 {
+					width: auto;
+					height: 46px;
+				}
+				
+				</style>
+				
+		<?php	
+		}
+		
 		public function extend_ajax_var($ajax_var) {
 			
 			global $post;			
@@ -39,7 +56,14 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 		
 		public function options_attachments($options, $value) {
 
-			$post_id = $_REQUEST["post_id"];
+			global $post;
+			
+			if (isset($_REQUEST["post_id"])) {
+				$post_id = $_REQUEST["post_id"];
+			} else if (isset($post->ID)) {
+				$post_id = $post->ID;
+			} 
+			
 			$values = $this->get_attachment($post_id, $value, $options);
 			
 			return $values;
@@ -53,30 +77,35 @@ class bcf_chooser_post_attachments extends bcf_chooser {
 			$options = $options[0];
 			
 			//if ($options == '*') $options = '';
-			$value = explode(",", $value);
-			$value = array_flip($value);		
+			if (strpos( $value, ',') !== FALSE) {
+				$value = explode(",", $value);
+				$value = array_flip($value);		
+			}
 			
 			$args = array(
-				'post_status' => null,
+				'post_status' => 'any',
 				'post_type' => 'attachment',
 				'post_mime_type' => $options,
 				'post_parent' => $post_id,
-				'order_by' => 'title',
-				'order' => 'asc',
+				'orderby' => 'title',
+				'order' => 'DESC',
+				'posts_per_page' => -1
 			);
 			$a = get_posts($args);
-
+			
 			if ($a) {
 					foreach($a as $attachment) {
 				
 					//Becco il thumb del file
 					$thumb = wp_get_attachment_image( $attachment->ID, array(46, 46), TRUE  );
 					
-					if (!is_array($value)) {
+					//if (!is_array($value)) {
 						$post_attachments[] = $attachment->ID."[::]" . $thumb  . get_the_title($attachment->ID);
+						/*
 					} else {
+					
 						$post_attachments[ $value[$attachment->ID] ] = $attachment->ID."[::]" . $thumb  . get_the_title($attachment->ID) . " | <a href=\"". get_permalink($attachment->ID)."\" target=\"_blank\" title=\"#". $attachment->ID."\">view</a>";
-					}
+					}*/
 				}
 			}
 			

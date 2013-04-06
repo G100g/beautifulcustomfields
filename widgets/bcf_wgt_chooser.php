@@ -55,20 +55,18 @@ class bcf_chooser extends bcf_select {
 
 		//Creo la lista dei campi già inseriti
 		
-
-		
 		//Ottengo l'elenco
 		$selected_options = explode(",", $value);
 		$json_selected_options = array();
 		
 		if (!empty($value)) {
-			
+
 			$options = $this->_get_options($field, $value);
 
 			foreach($options as $k => $option) {
 					
 				$option = explode("[::]", $option);
-							
+
 				if (in_array($option[0], $selected_options)) {
 	
 					$json_selected_options[] = (object) array("id" => $option[0], 'name' => $option[1]);
@@ -101,6 +99,7 @@ class bcf_chooser extends bcf_select {
 
 		//$post->ID
 		
+		
 ?>
 	<script type="text/javascript">
 	jQuery(function($) {
@@ -112,7 +111,7 @@ class bcf_chooser extends bcf_select {
 														prePopulate: <?php echo json_encode($json_selected_options); ?>,
 														animateDropdown: false,
 														preventDuplicates: true,
-														minChars: 2,
+														minChars: 0,
 														tokenLimit: <?php echo is_numeric($options["tokenLimit"]) ? $options["tokenLimit"] : 'null'; ?>,
 														theme: 'wp'
 														<?php if ($options["tokenLimit"] != 1) : ?>
@@ -203,7 +202,7 @@ class bcf_chooser extends bcf_select {
 		//Becco i dati del campo detto 
 		$class_name = "bcf_" . $field->type;//"bcf_chooser";
 
-		if ( class_exists( $class_name ) ) {
+		if ( class_exists( $class_name ,false) ) {
 			$f = new $class_name();
 			if (method_exists($f, '_get_options') ) {
 				$options = $f->_get_options($field);
@@ -211,7 +210,7 @@ class bcf_chooser extends bcf_select {
 		}
 		
 		*/
-		
+
 		$options = $this->_get_options($field);
 		
 		$source = array();

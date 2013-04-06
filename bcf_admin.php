@@ -13,8 +13,11 @@ class Beautiful_custom_fields_admin {
 	
 		$this->bcf = $_bcf;
 		
-		add_action( "admin_print_styles", array(&$this, 'add_style'), 10);
-		add_action( "admin_print_scripts", array(&$this, 'add_javascript'), 10);
+		//add_action( "admin_print_styles", array(&$this, 'add_style'), 10);
+		//add_action( "admin_print_scripts", array(&$this, 'add_javascript'), 10);
+		add_action( "admin_enqueue_scripts", array(&$this, 'add_style'), 10);
+		add_action( "admin_enqueue_scripts", array(&$this, 'add_javascript'), 10);
+		
 		
 		add_action('admin_menu', array(&$this, 'admin_menu'), 10);
 	
@@ -54,7 +57,7 @@ class Beautiful_custom_fields_admin {
 	
 	
 		//Aggiungo la pagina ai settings
-		add_options_page('Beautiful Custom Fields', 'Beautiful Custom Fields', 8, basename(__FILE__), array(&$this, 'admin_page') );
+		add_options_page('Beautiful Custom Fields', 'Beautiful Custom Fields', 'update_core', basename(__FILE__), array(&$this, 'admin_page') );
 		//add_menu_page('Supple Forms', 'Supple Forms', 9, basename(__FILE__), array(&$suppleForms, 'loadAdminPage'));
 	
 	}	
@@ -88,11 +91,13 @@ class Beautiful_custom_fields_admin {
 	
 	}
 	
+	/*
 	function _array_remove_key ()
 	{
 	  $args  = func_get_args();
 	  return array_diff_key($args[0],array_flip(array_slice($args,1)));
 	}
+	*/
 	
 	function create_field($name, $cf_name, $type_options, $taxonomy, $posts_ids, $custom_post_types, $type, $sort, $multiple, $multilanguage, $depth, $page_template_ids) {
 	
@@ -134,6 +139,27 @@ class Beautiful_custom_fields_admin {
 		
 		
 		$msg = array();
+
+	//Imposto i valori di default
+		$nf_name = "";
+		$nf_cf_name = "";
+		$nf_type_options = null;
+		$nf_posts_ids = null;
+		$nf_custom_post_types = null;
+		$nf_taxonomy = null;
+		$nf_sort = 0;
+		$nf_multilanguage = 0;
+		$nf_type = null;
+		$nf_multiple = null;
+		$nf_depth = 0;
+		$nf_page_template_ids = null;
+		$nf_box = 0;
+	
+	
+		$box_index = 0;
+		$box_title = "";
+		$box_context = 0;
+		$box_priority = 0;
 
 	// If form was submitted
 	if (isset($_REQUEST['action'])) {			
@@ -304,22 +330,54 @@ class Beautiful_custom_fields_admin {
 			  		case 'add':
 			  		
 			  			$form_errors = FALSE;
+			  			
+			  			//Ritrovo i campi inviati
+			  			
+			  			$nf_name = isset($_REQUEST['nf_name']) ? trim($_REQUEST['nf_name']) : '';
+		  				$nf_cf_name = isset($_REQUEST['nf_cf_name']) ? trim($_REQUEST['nf_cf_name']) : '';
+		  				$nf_type_options = isset($_REQUEST['nf_type_options']) ? trim($_REQUEST['nf_type_options']) : '';
+		  				$nf_posts_ids = isset($_REQUEST['nf_posts_ids']) ? $_REQUEST['nf_posts_ids'] : '';
+		  				$nf_custom_post_types = isset($_REQUEST['nf_custom_post_types']) ? $_REQUEST['nf_custom_post_types'] : '';
+		  				$nf_taxonomy = isset($_REQUEST['nf_taxonomy']) ? $_REQUEST['nf_taxonomy'] : '';
+		  				$nf_sort = isset($_REQUEST['nf_sort']) ? $_REQUEST['nf_sort'] : 0;
+		  				$nf_multilanguage = isset($_REQUEST['nf_multilanguage']) ? $_REQUEST['nf_multilanguage'] : '';
+		  				$nf_type = isset($_REQUEST['nf_type']) ? $_REQUEST['nf_type'] : '';
+		  				$nf_multiple = isset($_REQUEST['nf_multiple']) ? $_REQUEST['nf_multiple'] : '';
+		  				$nf_depth = isset($_REQUEST['nf_depth']) ? $_REQUEST['nf_depth'] : '';
+		  				$nf_page_template_ids = isset($_REQUEST['nf_page_template_ids']) ? $_REQUEST['nf_page_template_ids'] : '';
+		  				$nf_box = isset($_REQUEST['nf_box']) ? $_REQUEST['nf_box'] : '';
 			  		
-			  			if (trim($_REQUEST['nf_name']) != '' && trim($_REQUEST['nf_cf_name']) != '' && ( !empty($_REQUEST['nf_taxonomy']) || !empty($_REQUEST['nf_posts_ids']) || !empty($_REQUEST['nf_custom_post_types']) ) ) {
+			  			if ( 	$nf_name != '' &&
+			  					$nf_cf_name != '' &&
+			  					(
+				  					!empty($nf_taxonomy) ||
+				  					!empty($nf_posts_ids) || 
+				  					!empty($nf_custom_post_types)
+			  					)
+			  				) {
+			  				/*
+			  				(isset($_REQUEST['nf_name']) && trim($_REQUEST['nf_name'])) != '' &&
+			  				(isset($_REQUEST['nf_cf_name']) && trim($_REQUEST['nf_cf_name'])) != '' && 
+			  				(isset($_REQUEST['nf_taxonomy']) && !empty($_REQUEST['nf_taxonomy']) || 
+			  				(isset($_REQUEST['nf_posts_ids']) && !empty($_REQUEST['nf_posts_ids'])) || 
+			  				(isset($_REQUEST['nf_custom_post_types']) && !empty($_REQUEST['nf_custom_post_types'])) ) ) {
+			  				*/
 				  			
-				  			if ($_REQUEST['nf_sort'] == '') {
-				  				$_REQUEST['nf_sort'] = 0;
+				  			if ($nf_sort == '') {
+				  				$nf_sort = 0;
 				  			}
 				  			
 				  			//Aggiungo il campo all'array
-				  			$new_field_obj = $this->create_field( $_REQUEST['nf_name'], $_REQUEST['nf_cf_name'], $_REQUEST['nf_type_options'], $_REQUEST['nf_taxonomy'], $_REQUEST['nf_posts_ids'], $_REQUEST['nf_custom_post_types'], $_REQUEST['nf_type'], $_REQUEST['nf_sort'], $_REQUEST['nf_multiple'], $_REQUEST['nf_multilanguage'], $_REQUEST['nf_depth'], $_REQUEST['nf_page_template_ids'] );
+				  			//$new_field_obj = $this->create_field( $_REQUEST['nf_name'], $_REQUEST['nf_cf_name'], $_REQUEST['nf_type_options'], $_REQUEST['nf_taxonomy'], $_REQUEST['nf_posts_ids'], $_REQUEST['nf_custom_post_types'], $_REQUEST['nf_type'], $_REQUEST['nf_sort'], $_REQUEST['nf_multiple'], $_REQUEST['nf_multilanguage'], $_REQUEST['nf_depth'], $_REQUEST['nf_page_template_ids'] );				  			
+				  			$new_field_obj = $this->create_field( $nf_name, $nf_cf_name, $nf_type_options, $nf_taxonomy, $nf_posts_ids, $nf_custom_post_types, $nf_type, $nf_sort, $nf_multiple, $nf_multilanguage, $nf_depth, $nf_page_template_ids );
 				  			
 				  			if ( $new_field_obj ) {
 				  				
 				  				//Ritrovo i valori
 				  				$tmp_bcf_fields = unserialize( get_option('bcf_fields') );
 				  				
-				  				$cf_key_value = $this->clean_custom_field_value($_REQUEST['nf_cf_name']);
+				  				//$cf_key_value = $this->clean_custom_field_value($_REQUEST['nf_cf_name']);
+				  				$cf_key_value = $this->clean_custom_field_value($nf_cf_name);
 				  				
 				  				//Controllo se esiste il campo
 				  				
@@ -333,11 +391,13 @@ class Beautiful_custom_fields_admin {
 				  				
 				  				} else {
 				  				
-					  				$tmp_bcf_fields[$_REQUEST['nf_box']][ $cf_key_value ] = $new_field_obj;
+					  				//$tmp_bcf_fields[$_REQUEST['nf_box']][ $cf_key_value ] = $new_field_obj;
+					  				$tmp_bcf_fields[$nf_box][ $cf_key_value ] = $new_field_obj;
 					  				
 					  				//Se è cambiato il box elimino il campo dal vecchio box
 					  				
-					  				if (isset($_REQUEST['old_nf_box']) && $_REQUEST['old_nf_box'] != $_REQUEST['nf_box']) {				  				
+					  				//if (isset($_REQUEST['old_nf_box']) && $_REQUEST['old_nf_box'] != $_REQUEST['nf_box']) {				  				
+					  				if (isset($_REQUEST['old_nf_box']) && $_REQUEST['old_nf_box'] != $nf_box) {				  				
 					  					unset($tmp_bcf_fields[$_REQUEST['old_nf_box']]);
 					  				}				  				
 					  				
@@ -355,8 +415,9 @@ class Beautiful_custom_fields_admin {
 			  			
 			  			}
 			  			
+			  			/*
 			  			if ($form_errors) {
-			  				
+			  			
 			  				$nf_name = $_REQUEST['nf_name'];
 			  				$nf_cf_name = trim($_REQUEST['nf_cf_name']);
 			  				$nf_type_options = trim($_REQUEST['nf_type_options']);
@@ -371,10 +432,8 @@ class Beautiful_custom_fields_admin {
 			  				$nf_page_template_ids = $_REQUEST['nf_page_template_ids'];
 			  				$nf_box = $_REQUEST['nf_box'];
 			  				
-			  			
-			  				
-			  			
 			  			}
+			  			*/
 			  		
 			  		break;
 			  		
@@ -386,7 +445,9 @@ class Beautiful_custom_fields_admin {
 				  			$tmp_bcf_fields = unserialize( get_option('bcf_fields') );			  			
 				  			
 				  			//Rimuovo la chiave dal'aaray
-				  			$tmp_bcf_fields[$_REQUEST['nf_box']] = $this->_array_remove_key($tmp_bcf_fields[0], $_REQUEST['cf_name']);
+				  			//$tmp_bcf_fields[$_REQUEST['nf_box']] = $this->_array_remove_key($tmp_bcf_fields[0], $_REQUEST['cf_name']);
+				  			
+				  			unset($tmp_bcf_fields[$_REQUEST['nf_box']][$_REQUEST['cf_name']]);
 				  			
 				  			update_option( 'bcf_fields', serialize( $tmp_bcf_fields ) );
 				  			
@@ -450,19 +511,37 @@ class Beautiful_custom_fields_admin {
 		   _e('<div id="message" class="updated fade"><p>' . $msg_status . '</p></div>');
 		   */
 		
-	}
+	} 
 
 	$nonce = wp_create_nonce('bcf');
-	$actionurl = $_SERVER['REQUEST_URI'];
+	$action_url = $_SERVER['REQUEST_URI'];	
 	$plainurl = 'admin.php?page=bcf_admin.php';
-	
-	
 	
 	$bcf_fields = get_option('bcf_fields');
 	$bcf_fields = is_string($bcf_fields) ? unserialize( $bcf_fields ) : $bcf_fields;
 	
 	$bcf_boxs = get_option('bcf_boxs');
+	
+	//Se non esiste un box ne creo uno
+	if (!is_string($bcf_boxs)) {
+	
+		$tmp_bcf_boxs[0] = array(
+  						'title' => "Options",
+  						'context' => 'normal',
+  						'priority' => 'high'
+  					);
+	
+		//Salvo i dati
+		$bcf_boxs = serialize($tmp_bcf_boxs);
+		
+		update_option( 'bcf_boxs', $bcf_boxs );
+	
+	}
+	
 	$bcf_boxs = is_string($bcf_boxs) ? unserialize( $bcf_boxs ) : $bcf_boxs;
+	
+	
+	
 		
 	//Ritrovo le categorie e creo un checkbox
 	//$post_categories = get_categories(array('hide_empty'=> false));
@@ -514,7 +593,10 @@ class Beautiful_custom_fields_admin {
 
 <?php endforeach; endif; ?>	
 	
+	
 	<div id="forms">
+	
+		<?php if (is_array($bcf_boxs) && !empty($bcf_boxs)) : ?>
 	
 		<div id="form-field" class="metabox-holder disabled-metabox-holder-disabled">
 		
@@ -522,7 +604,7 @@ class Beautiful_custom_fields_admin {
 		
 				<h3><span>New Field</span></h3>
 				<div class="inside">	
-		
+				
 					<form action="<?php echo $action_url; ?>" method="post">
 						<input type="hidden" name="action" value="add" />
 						<input type="hidden" id="_wpnonce" name="_wpnonce" value="<?php echo $nonce; ?>" />
@@ -714,7 +796,7 @@ class Beautiful_custom_fields_admin {
 		</tbody>
 		
 		</table>
-		<?php if ($_REQUEST['action'] == 'edit') : ?>
+		<?php if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'edit') : ?>
 		<input type="hidden" name="old_nf_box" value="<?php echo $nf_box; ?>" />
 		<input type="hidden" name="old_nf_cf_name" value="<?php echo $nf_cf_name; ?>" />
 		
@@ -730,17 +812,20 @@ class Beautiful_custom_fields_admin {
 		
 		</div> <!-- metabox-holder -->
 		
+		<?php endif; ?>
+		
 		<div id="form-box" class="metabox-holder disabled-metabox-holder-disabled">
 		
 			<div class="postbox">
 		
 				<h3><span>New Box</span></h3>
 				<div class="inside">	
-				
-					<p>We have to insert some kind of box here.</p>
+					<?php if (is_array($bcf_boxs) && empty($bcf_boxs)) : ?>
+					<p>To add fields, you have to create a box.</p>
+					<?php endif; ?>
 					
 					<form action="<?php echo $action_url; ?>" method="post">
-						<?php if ($_REQUEST['action'] == 'edit_box') : ?>
+						<?php if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'edit_box') : ?>
 						<input type="hidden" name="action" value="save_box" />
 						<input type="hidden" name="box_index" value="<?php echo $box_index; ?>" />
 						
@@ -784,7 +869,7 @@ class Beautiful_custom_fields_admin {
 							</tbody>
 						
 						</table>
-						<?php if ($_REQUEST['action'] == 'edit_box') : ?>
+						<?php if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'edit_box') : ?>
 						<p class="submit"><input type="submit" value="Create New Box" class="button-highlighted button" name="create_box"/> <input type="submit" value="Save" class="button-primary" name="Submit"/></p>
 						<?php else: ?>
 						<p class="submit"><input type="submit" value="Create" class="button-primary" name="Submit"/></p>
@@ -963,7 +1048,7 @@ class Beautiful_custom_fields_admin {
 		
 		$class_name = "bcf_".$widget_name;
 
-		if ( class_exists( $class_name ) ) {				
+		if ( class_exists( $class_name ,false) ) {				
 
 			if (method_exists($class_name, 'option_init') ) {
 				if(is_callable(array($class_name,"option_init"))) {
