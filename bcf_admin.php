@@ -558,7 +558,8 @@ class Beautiful_custom_fields_admin {
 //	$page_templates = array_merge(array('Default' => "default"), $page_templates);	
 	
 	//Ritrovo i custom post type
-	$custom_post_types = get_post_types(array(
+	/*
+$custom_post_types = get_post_types(array(
 			'public'   => true,
 			'_builtin' => false
 	
@@ -566,6 +567,25 @@ class Beautiful_custom_fields_admin {
 	
 	$custom_post_types[] = 'post';
 	$custom_post_types[] = 'page';
+*/
+
+	$custom_post_types = get_post_types(array(
+			'_builtin' => true,
+			'show_ui' => true
+	
+	), 'object');
+	
+	$custom_post_types_public = get_post_types(array(
+			'public'   => true,
+			'_builtin' => false,
+			'show_ui' => true
+	
+	), 'object');
+	
+	$custom_post_types = array_merge($custom_post_types, $custom_post_types_public);
+	if (array_key_exists('attachment', $custom_post_types)) {
+		unset($custom_post_types['attachment']);
+	}
 
 	//Tipi di input
 	//$this->fields_types = apply_filters( 'bcf_types', $this->fields_types );
@@ -609,8 +629,6 @@ class Beautiful_custom_fields_admin {
 						<input type="hidden" name="action" value="add" />
 						<input type="hidden" id="_wpnonce" name="_wpnonce" value="<?php echo $nonce; ?>" />
 		
-<!--		<h3>New Fields</h3> -->
-
 						<table class="form-table">
 							<tbody>
 									
@@ -622,6 +640,29 @@ class Beautiful_custom_fields_admin {
 								<th scope="row"><label for="nf_name">Name</label></th>
 								<td><input type="text" class="regular-text" value="<?php echo $nf_name; ?>" id="nf_name" name="nf_name"/></td>
 							</tr>
+							
+							<tr valign="top">
+								<th scope="row"><label for="nf_category">For Post Type</label></th>
+								<td>
+<?php 
+
+								foreach ($custom_post_types as $cpt => $cpt_data) : 
+									//setup_postdata($post);
+									$selected = '';
+									
+									if (is_array( $nf_custom_post_types )) {	
+										$selected = ( in_array( $cpt, $nf_custom_post_types ) ? ' checked="checked" ' : '' ); 
+									}
+			
+?>						
+									<label for="nf_custom_post_types-<?php echo $cpt; ?>"><input type="checkbox" value="<?php echo $cpt; ?>" id="nf_custom_post_types-<?php echo $cpt; ?>" name="nf_custom_post_types[]" <?php echo $selected; ?>/> <?php echo $cpt_data->labels->name; ?></label>
+
+<?php 							endforeach; ?>			
+
+								</td>
+							</tr>	
+							
+							<!--  taxonomy -->
 							<tr valign="top">
 								<th scope="row"><label for="nf_category">With Taxonomies</label></th>
 								<td>
@@ -656,12 +697,15 @@ class Beautiful_custom_fields_admin {
 <?php			endif;
 
 			endforeach; ?>			
-			</td>
-		</tr>
-		
-		<tr valign="top">
-					<th scope="row"><label for="nf_category">For Pages</label></th>
-					<td>
+							</td>
+						</tr> <!-- end taxonomy -->
+										
+										
+						<!-- pages options -->
+												
+						<tr valign="top" class="bfc_options_page">
+							<th scope="row"><label for="nf_category">For Pages</label></th>
+							<td>
 		<?php 
 		
 					foreach ($pages as $post) : setup_postdata($post);
@@ -671,15 +715,15 @@ class Beautiful_custom_fields_admin {
 						}
 					
 		?>						
-					<label for="nf_posts_ids-<?php echo $post->post_name; ?>"><input type="checkbox" value="<?php echo $post->ID; ?>" id="nf_posts_ids-<?php echo $post->post_name; ?>" name="nf_posts_ids[]" <?php echo $selected; ?>/> <?php the_title(); ?></label>
+								<label for="nf_posts_ids-<?php echo $post->post_name; ?>"><input type="checkbox" value="<?php echo $post->ID; ?>" id="nf_posts_ids-<?php echo $post->post_name; ?>" name="nf_posts_ids[]" <?php echo $selected; ?>/> <?php the_title(); ?></label>
 		
 		<?php 		endforeach; ?>			
-					</td>
-				</tr>
+							</td>
+						</tr>
 				
-		<tr valign="top">
-					<th scope="row"><label for="nf_category">With Page Templates</label></th>
-					<td>
+						<tr valign="top">
+							<th scope="row"><label for="nf_category">With Page Templates</label></th>
+							<td>
 		<?php 
 		
 					foreach ($page_templates as $key_page_template => $page_template) :
@@ -689,33 +733,14 @@ class Beautiful_custom_fields_admin {
 						}
 					
 		?>						
-					<label for="nf_page_template_ids-<?php echo $page_template; ?>"><input type="checkbox" value="<?php echo $page_template; ?>" id="nf_page_template_ids-<?php echo $page_template; ?>" name="nf_page_template_ids[]" <?php echo $selected; ?>/> <?php echo $key_page_template; ?></label>
+								<label for="nf_page_template_ids-<?php echo $page_template; ?>"><input type="checkbox" value="<?php echo $page_template; ?>" id="nf_page_template_ids-<?php echo $page_template; ?>" name="nf_page_template_ids[]" <?php echo $selected; ?>/> <?php echo $key_page_template; ?></label>
 		
 		<?php 		endforeach; ?>			
-					</td>
-				</tr>		
+							</td>
+						</tr>		
 				
+						<!-- end pages options -->
 				
-		<tr valign="top">
-			<th scope="row"><label for="nf_category">For Post Type</label></th>
-			<td>
-<?php 
-
-			foreach ($custom_post_types as $cpt) : 
-				//setup_postdata($post);
-				$selected = '';
-				
-				if (is_array( $nf_custom_post_types )) {	
-					$selected = ( in_array( $cpt, $nf_custom_post_types ) ? ' checked="checked" ' : '' ); 
-				}
-			
-?>						
-			<label for="nf_custom_post_types-<?php echo $cpt; ?>"><input type="checkbox" value="<?php echo $cpt; ?>" id="nf_custom_post_types-<?php echo $cpt; ?>" name="nf_custom_post_types[]" <?php echo $selected; ?>/> <?php echo $cpt; ?></label>
-
-<?php 		endforeach; ?>			
-			</td>
-		</tr>	
-		
 		<tr valign="top">
 					<th scope="row"><label for="nf_category">Depth Child</label></th>
 					<td><input type="text" class="regular-text" value="<?php echo $nf_depth; ?>" id="nf_depth" name="nf_depth"/></td>
