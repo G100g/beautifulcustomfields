@@ -21,12 +21,30 @@ class bcf_gallery extends bcf_text {
 			.bcf_gallery_preview {
 			
 			}
-				.bcf_gallery_preview img {
-					border: 1px solid #999;
-					margin-right: 6px;
+			
+				.bcf_gallery_preview .thumbnail {
+					color: #333;
+					text-align: center;
+				}
+				
+					.bcf_gallery_preview .thumbnail .title {
+						line-height: 32px;
+					}
 					
-					height: 80px;
+					.bcf_gallery_preview .image .title {
+						display: none;
+					}
+				
+				.bcf_gallery_preview img {
+					height: 32px;
 					width: auto;
+					margin-right: 6px;
+					vertical-align: middle;
+				}	
+				
+				.bcf_gallery_preview .image img {
+					border: 1px solid #999;
+					height: 60px;
 				} 
 		
 		</style>
@@ -49,10 +67,18 @@ class bcf_gallery extends bcf_text {
 				$image_ids = explode("," ,$value);
 				foreach($image_ids as $image_id) :
 				
-				$image = wp_get_attachment_image($image_id, 'thumbnail');
+				//if (wp_attachment_is_image($image_id)) {
+					$filename = basename ( get_attached_file( $image_id ) );
+					$image = wp_get_attachment_image($image_id, 'thumbnail', true);
 				
 ?>
-				<?php echo $image; ?>	
+				<span class="thumbnail <?php echo (wp_attachment_is_image($image_id) ? 'image' : ''); ?>">
+					<?php echo $image; ?>
+					<span class="title"><?php echo $filename; ?></span>
+				</span>
+				
+				
+					
 <?php				
 				endforeach;
 			
@@ -62,7 +88,7 @@ class bcf_gallery extends bcf_text {
 		
 		<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" class="full <?php echo $id. " " .$class; ?>" <?php echo ( !$active ? ' disabled="disabled"' : ''  ); ?> />
 		
-		<p><button id="<?php echo $name; ?>_new" class="button">Select Image<?php echo $options[0] == 1? "s" : ""; ?></button></p>
+		<p class="wrap"><button id="<?php echo $name; ?>_new" class="button">Select Media</button></p>
 		
 		<script type="text/javascript">
 		
@@ -98,25 +124,29 @@ class bcf_gallery extends bcf_text {
 				            multiple:   <?php echo ($options[0] == 1 ? 'true' : 'false'); ?>,
 				            selection:  selection,
 				            library: {
-					            type: 'image'
+					            type: '<?php echo ($options[1] == "" ? 'image' : $options[1]); ?>'
          					},
 				        });
 				        
 				        this._frame.on( 'select', function (attachments) {
 				        
 					        var attachment = _self._frame.state().get('selection').first().toJSON();
- 							_self.update_preview([ attachment.sizes.thumbnail.url ]);
+ 							//_self.update_preview([ attachment.sizes.thumbnail.url ]);
+ 							_self.update_preview([ attachment ]);
  							_self.update_field(attachment.id);
  							
 				        });
 				        
 				        this._frame.on( 'update', function (attachments) {
-				        
+				        	/*
 				        	var image_urls = [];
 				        	attachments.each(function(attachment) {
 								image_urls.push(attachment.get('sizes').thumbnail.url);
 						    });
 						    _self.update_preview(image_urls);
+						    */
+						    
+						    _self.update_preview(attachments.toJSON());
 						    
 						    var ids = attachments.pluck('id');						    
 						    _self.update_field(ids);
@@ -126,11 +156,14 @@ class bcf_gallery extends bcf_text {
 				        return this._frame;
 				    },
 				    
-				    update_preview: function (images) {
+				    update_preview: function (attachments) {
 				    	var _self = this;
 				    	this.$preview.html("");
-			        	$.each(images, function(i, image) {
-					        _self.$preview.append('<img src="'+image+'" />');
+			        	$.each(attachments, function(i, attachment) {
+			        	
+//			        		console.log(attachment);
+			        		var icon_image = attachment.type == 'image' ? attachment.sizes.thumbnail.url : attachment.icon;
+			        	    _self.$preview.append('<span class="thumbnail '+attachment.type+'"><img src="'+icon_image+'" /><span class="title">'+attachment.filename+'</span></span>');
 					    });
 				    },
 				    
