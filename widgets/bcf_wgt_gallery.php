@@ -13,41 +13,51 @@
 
 class bcf_gallery extends bcf_text {
 
+	public function init() {			
+	
+		//wp_enqueue_script('jquery-tokeninput', WP_PLUGIN_URL.'/beautifulcustomfields/
+		//wp_enqueue_style('jquery-tokeninput-css', WP_PLUGIN_URL.'/beautifulcustomfields/lib/jquery-tokeninput/token-input-wp.css','', '1.5.0');
+		wp_enqueue_script('bcf_gallery', plugins_url( 'js/bcf_gallery.js', dirname(__FILE__) ), array('backbone'), '0.0.1', true);
+		//wp_enqueue_style('jquery-tokeninput-css', plugins_url( 'lib/jquery-tokeninput/token-input-wp.css', dirname(__FILE__) ), NULL, '1.5.0');
+	}
+
 	public function html_header() {
 ?>
 		
 		<style type="text/css">
 		
-			.bcf_gallery_preview {
-			
+			.bcf_gallery_view .preview {
+				float: inherit;
 			}
 			
-				.bcf_gallery_preview .thumbnail {
+				.bcf_gallery_view .preview .thumbnail {
 					color: #333;
 					text-align: center;
 				}
 				
-					.bcf_gallery_preview .thumbnail .title {
+					.bcf_gallery_view .preview .thumbnail .title {
 						line-height: 32px;
 					}
 					
-					.bcf_gallery_preview .image .title {
+					.bcf_gallery_view .preview .image .title {
 						display: none;
 					}
 				
-				.bcf_gallery_preview img {
+				.bcf_gallery_view .preview img {
 					height: 32px;
 					width: auto;
 					margin-right: 6px;
 					vertical-align: middle;
 				}	
 				
-				.bcf_gallery_preview .image img {
+				.bcf_gallery_view .preview .image img {
 					border: 1px solid #999;
 					height: 60px;
 				} 
 		
 		</style>
+		
+		<script type="text/javascript"></script>
 <?php
 		
 	}
@@ -59,7 +69,9 @@ class bcf_gallery extends bcf_text {
 		$options = explode(",", $field->type_options);
 		
 ?>		
-		<p id="<?php echo $name; ?>_preview" class="bcf_gallery_preview">
+		<div id="<?php echo $name; ?>_view" class="bcf_gallery_view">
+		
+			<p class="preview">
 <?php
 		
 			if ($value != "") {
@@ -72,10 +84,10 @@ class bcf_gallery extends bcf_text {
 					$image = wp_get_attachment_image($image_id, 'thumbnail', true);
 				
 ?>
-				<span class="thumbnail <?php echo (wp_attachment_is_image($image_id) ? 'image' : ''); ?>">
-					<?php echo $image; ?>
-					<span class="title"><?php echo $filename; ?></span>
-				</span>
+					<span class="thumbnail <?php echo (wp_attachment_is_image($image_id) ? 'image' : ''); ?>">
+						<?php echo $image; ?>
+						<span class="title"><?php echo $filename; ?></span>
+					</span>
 				
 				
 					
@@ -84,11 +96,13 @@ class bcf_gallery extends bcf_text {
 			
 			}
 ?>
-		</p>
+			</p>
 		
-		<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" class="full <?php echo $id. " " .$class; ?>" <?php echo ( !$active ? ' disabled="disabled"' : ''  ); ?> />
+			<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" class="full <?php echo $id. " " .$class; ?>" <?php echo ( !$active ? ' disabled="disabled"' : ''  ); ?> />
 		
-		<p class="wrap"><button id="<?php echo $name; ?>_new" class="button">Select Media</button></p>
+			<p><button id="<?php echo $name; ?>_new" class="button select_media">Select Media</button></p>
+		
+		</div>
 		
 		<script type="text/javascript">
 		
@@ -96,128 +110,15 @@ class bcf_gallery extends bcf_text {
 			
 				$(document).ready(function(){
 				
-				var bcf_field_name = '<?php echo $name; ?>';
-				
-				wp.media[bcf_field_name] = {
-				
-					$preview: $('#'+bcf_field_name+'_preview'),
-					$field_input: $('#'+bcf_field_name),
-	     
-				    frame: function() {
-				        
-				        if ( this._frame )
-				            return this._frame;
-				            
-				        var _self = this;
+					var bcf_field_name = '<?php echo $name; ?>';
+					new bcf_gallery({
+						el: bcf_field_name,
+						field_name: bcf_field_name,
 						
-						var selection = this.select();
-				        this._frame = wp.media({
-				            id:         bcf_field_name,
-				            <?php echo ($options[0] == 1 ? "frame:      'post'," : ""); ?>
-				            <?php echo ($options[0] == 1 ? "state: 'gallery-edit'," : ""); ?>
-				            title:      <?php echo ($options[0] == 1 ? 'wp.media.view.l10n.editGalleryTitle' : 'wp.media.view.l10n.insertMediaTitle'); ?>,
-				            <?php echo ($options[0] == 1 ? "editing:    true," : ""); ?>
-
-				            button: {
-								text: 'Select File',
-      						},
-				            multiple:   <?php echo ($options[0] == 1 ? 'true' : 'false'); ?>,
-				            selection:  selection,
-				            library: {
-					            type: '<?php echo ($options[1] == "" ? 'image' : $options[1]); ?>'
-         					},
-				        });
-				        
-				        this._frame.on( 'select', function (attachments) {
-				        
-					        var attachment = _self._frame.state().get('selection').first().toJSON();
- 							//_self.update_preview([ attachment.sizes.thumbnail.url ]);
- 							_self.update_preview([ attachment ]);
- 							_self.update_field(attachment.id);
- 							
-				        });
-				        
-				        this._frame.on( 'update', function (attachments) {
-				        	/*
-				        	var image_urls = [];
-				        	attachments.each(function(attachment) {
-								image_urls.push(attachment.get('sizes').thumbnail.url);
-						    });
-						    _self.update_preview(image_urls);
-						    */
-						    
-						    _self.update_preview(attachments.toJSON());
-						    
-						    var ids = attachments.pluck('id');						    
-						    _self.update_field(ids);
-						    
-				        });
-				        
-				        return this._frame;
-				    },
-				    
-				    update_preview: function (attachments) {
-				    	var _self = this;
-				    	this.$preview.html("");
-			        	$.each(attachments, function(i, attachment) {
-			        	
-//			        		console.log(attachment);
-			        		var icon_image = attachment.type == 'image' ? attachment.sizes.thumbnail.url : attachment.icon;
-			        	    _self.$preview.append('<span class="thumbnail '+attachment.type+'"><img src="'+icon_image+'" /><span class="title">'+attachment.filename+'</span></span>');
-					    });
-				    },
-				    
-				    update_field: function (value) {
-				    	this.$field_input.val(value);
-				    },
-				 
-				    init: function() {
-				        
-				        $('#'+bcf_field_name+'_new').click( function( event ) {
-				        
-				            event.preventDefault();
-				            wp.media[bcf_field_name].frame().open();
-				 
-				        });
-				        
-				    },
-				    
-				    select: function() {
-						    var shortcode = wp.shortcode.next( 'gallery', '[gallery ids="'+this.$field_input.val()+'"]'  ),
-						        defaultPostId = wp.media.gallery.defaults.id,
-						        attachments, selection;
-						 
-						    // Bail if we didn't match the shortcode or all of the content.
-						    if ( ! shortcode )
-						        return;
-						 
-						    // Ignore the rest of the match object.
-						    shortcode = shortcode.shortcode;
-						 
-						    if ( _.isUndefined( shortcode.get('id') ) && ! _.isUndefined( defaultPostId ) )
-						        shortcode.set( 'id', defaultPostId );
-						 
-						    attachments = wp.media.gallery.attachments( shortcode );
-						    selection = new wp.media.model.Selection( attachments.models, {
-						        props:    attachments.props.toJSON(),
-						        multiple: true
-						    });
-						     
-						    selection.gallery = attachments.gallery;
-						 
-						    // Fetch the query's attachments, and then break ties from the
-						    // query to allow for sorting.
-						    selection.more().done( function() {
-						        // Break ties with the query.
-						        selection.props.set({ query: false });
-						        selection.unmirror();
-						        selection.props.unset('orderby');
-						    });
-						    return selection;
-						},
-				};
-				
-				    $( wp.media[bcf_field_name].init );
+						multi_selection: <?php echo ($options[0] == 1 ? "true" : "false"); ?>,
+						mime_type: '<?php echo ($options[1] == "" ? 'image' : $options[1]); ?>'
+						
+						});
 				    
 				});
 			
