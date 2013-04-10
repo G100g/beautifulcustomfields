@@ -48,7 +48,6 @@ class bcf_gallery extends bcf_text {
 				
 					$preview = $('#<?php echo $name; ?>_preview');
 				
-				
 				wp.media.bcf_gallery = {
 	     
 				    frame: function() {
@@ -102,7 +101,7 @@ class bcf_gallery extends bcf_text {
 						    
 				        	onon.each(function(attachment) {
 						        console.log(attachment);
-        // this will return an object with all the attachment-details
+						        // this will return an object with all the attachment-details
 						    });
 				        	
 						    
@@ -117,8 +116,6 @@ class bcf_gallery extends bcf_text {
 						    */
 						    
 				        });
-				        
-				       // this._frame.
 				        
 				        return this._frame;
 				    },
