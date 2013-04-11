@@ -112,7 +112,7 @@ class bcf_gallery extends bcf_text {
 				
 					var bcf_field_name = '<?php echo $name; ?>';
 					new bcf_gallery({
-						el: bcf_field_name,
+						el: '#'+bcf_field_name + '_view',
 						field_name: bcf_field_name,
 						
 						multi_selection: <?php echo ($options[0] == 1 ? "true" : "false"); ?>,
