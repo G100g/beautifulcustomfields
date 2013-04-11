@@ -33,6 +33,7 @@ class bcf_gallery extends bcf_text {
 				.bcf_gallery_view .preview .thumbnail {
 					color: #333;
 					text-align: center;
+					margin-right: 6px;
 				}
 				
 					.bcf_gallery_view .preview .thumbnail .title {
@@ -46,7 +47,6 @@ class bcf_gallery extends bcf_text {
 				.bcf_gallery_view .preview img {
 					height: 32px;
 					width: auto;
-					margin-right: 6px;
 					vertical-align: middle;
 				}	
 				
@@ -100,7 +100,7 @@ class bcf_gallery extends bcf_text {
 		
 			<input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>" class="full <?php echo $id. " " .$class; ?>" <?php echo ( !$active ? ' disabled="disabled"' : ''  ); ?> />
 		
-			<p><button id="<?php echo $name; ?>_new" class="button select_media">Select Media</button></p>
+			<p><button class="button select_media">Select Media</button> <button class="button reset_media <?php echo ($value == "" ? 'hidden' : ''); ?>">Reset</button></p>
 		
 		</div>
 		
@@ -115,7 +115,7 @@ class bcf_gallery extends bcf_text {
 						el: '#'+bcf_field_name + '_view',
 						field_name: bcf_field_name,
 						
-						multi_selection: <?php echo ($options[0] == 1 ? "true" : "false"); ?>,
+						multiple: <?php echo ($options[0] == 1 ? "true" : "false"); ?>,
 						mime_type: '<?php echo ($options[1] == "" ? 'image' : $options[1]); ?>'
 						
 						});

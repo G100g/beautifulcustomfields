@@ -13,8 +13,14 @@ events: {
 */		initialize: function () {
 				
 				this.$button = this.$('button.select_media');
+				this.$reset_button = this.$('button.reset_media');
+				
 				this.$preview = this.$('.preview');
 				this.$field_input = this.$('#'+this.options.field_name);
+				
+				this.is_gallery = (this.options.mime_type.lastIndexOf( "image" ) > -1 && this.options.multiple) || false;
+					
+				//_.bindAll(this, 'select');	
 					
 				this.init_frame();
 				
@@ -27,28 +33,34 @@ events: {
 			frame: function () {
 			
 				var _frame,
-					options = this.options,
-					selection = this.select()
-				;
+					options = this.options
+				;	
 				
 				options.mime_type.toLowerCase();				
 				if (options.mime_type == "") options.mime_type = "image";
 				
-				if (options.mime_type.lastIndexOf( "image" ) == -1  ) {
+				if (this.is_gallery ) {
 				
-					_frame = new BCFPost({
-							
-						id:         options.field_name,
-						multiple:		options.multi_selection ? true : false,
-						button: {
+					var selection = this.select();
+			
+					_frame = wp.media({
+			            id:         options.field_name,
+			            frame:		options.multiple ? 'post' : 'select',
+			            state:		options.multiple ? 'gallery-edit' : null,
+			            title:  	options.multiple ?  wp.media.view.l10n.editGalleryTitle : wp.media.view.l10n.insertMediaTitle,
+			            editing:		options.multiple ? true : false,
+
+			            button: {
 							text: 'Select File',
   						},
-  						selection:  selection,
-						library: {
+			            multiple:		options.multiple ? true : false,
+			            selection:  selection,
+			            library: {
 				            type: options.mime_type == "" ? 'image' : options.mime_type
      					}
+			        });
+				
 					
-					});
 				
 					/*
 
@@ -56,14 +68,14 @@ events: {
 			            id:         options.field_name,
 			            frame:		'post',
 //			            state: 'insert',
-			            title:  	options.multi_selection ?  wp.media.view.l10n.editGalleryTitle : wp.media.view.l10n.insertMediaTitle,
-			            //editing:		options.multi_selection ? true : false,
+			            title:  	options.multiple ?  wp.media.view.l10n.editGalleryTitle : wp.media.view.l10n.insertMediaTitle,
+			            //editing:		options.multiple ? true : false,
 			            editing: false,
 
 			            button: {
 							text: 'Select File',
   						},
-			            multiple:		options.multi_selection ? true : false,
+			            multiple:		options.multiple ? true : false,
 			            selection:  selection,
 			            library: {
 				            type: options.mime_type == "" ? 'image' : options.mime_type
@@ -76,22 +88,19 @@ events: {
 			        
 				} else {
 			
-					_frame = wp.media({
-			            id:         options.field_name,
-			            frame:		options.multi_selection ? 'post' : 'select',
-			            state:		options.multi_selection ? 'gallery-edit' : null,
-			            title:  	options.multi_selection ?  wp.media.view.l10n.editGalleryTitle : wp.media.view.l10n.insertMediaTitle,
-			            editing:		options.multi_selection ? true : false,
-
-			            button: {
+					_frame = new BCFPost({
+							
+						id:         options.field_name,
+						multiple:		options.multiple ? true : false,
+						button: {
 							text: 'Select File',
   						},
-			            multiple:		options.multi_selection ? true : false,
-			            selection:  selection,
-			            library: {
+  						//selection:  selection,
+						library: {
 				            type: options.mime_type == "" ? 'image' : options.mime_type
      					}
-			        });
+					
+					});
 				
 				}
 				
@@ -117,34 +126,30 @@ events: {
 						
 				        this._frame = _view.frame();
 				        
-				        this._frame.on( 'select', function (attachments) {
+				        this._frame.on( 'insert', function () {
+					        
+					        var attachments = _self._frame.state().get('selection');
+					        _view.update(attachments);
+					        
+				        });
 				        
-				        	console.log('select', attachments);
+				        this._frame.on( 'select', function () {
 				        
-					        var attachment = _self._frame.state().get('selection').first().toJSON();
- 							//_self.update_preview([ attachment.sizes.thumbnail.url ]);
- 							_view.update_preview([ attachment ]);
- 							_view.update_field(attachment.id);
+					        //var attachment = _self._frame.state().get('selection').first().toJSON();
+					        
+					        var attachments = _self._frame.state().get('selection');
+					         _view.update(attachments);
  							
+				        });
+				        
+				        this._frame.on('open',function() {
+				        	if (!options.is_gallery )
+											        	_view._select();
 				        });
 				        
 				        this._frame.on( 'update', function (attachments) {
 				        
-				        	console.log('update', attachments);
-
-				        
-				        	/*
-				        	var image_urls = [];
-				        	attachments.each(function(attachment) {
-								image_urls.push(attachment.get('sizes').thumbnail.url);
-						    });
-						    _self.update_preview(image_urls);
-						    */
-						    
-						    _view.update_preview(attachments.toJSON());
-						    
-						    var ids = attachments.pluck('id');						    
-						    _view.update_field(ids);
+				        	 _view.update(attachments);
 						    
 				        });
 				        
@@ -158,6 +163,16 @@ events: {
 				            wp.media[bcf_field_name].frame().open();
 				        });
 				        
+				       _view.$reset_button.click( function( event ) {
+				            event.preventDefault();
+				            //wp.media[bcf_field_name].frame().open();
+				            
+				            _view.reset();
+				            
+				       });
+				        
+				        
+				        
 				    },
 				    
 				};
@@ -170,18 +185,63 @@ events: {
 		    	var _self = this;
 		    	this.$preview.html("");
 	        	$.each(attachments, function(i, attachment) {
-	        	
 	        		var icon_image = attachment.type == 'image' ? attachment.sizes.thumbnail.url : attachment.icon;
 	        	    _self.$preview.append('<span class="thumbnail '+attachment.type+'"><img src="'+icon_image+'" /><span class="title">'+attachment.filename+'</span></span>');
 			    });
+			    
+			    this.$reset_button.removeClass('hidden');
+			    
+		    },
+		    
+		    reset_preview: function () {
+		    	var _self = this;
+		    	this.$preview.html("");
+	        	this.$reset_button.addClass('hidden');
+	        	
 		    },
 		    
 		    update_field: function (value) {
 		    	this.$field_input.val(value);
 		    },
+		    
+		    reset: function (attachments) {
+		    
+		    	this.reset_preview();
+		    	this.update_field('');
+		    
+		    },
+		    
+		    update: function (attachments) {
+			    
+			    this.update_preview(attachments.toJSON());
+				var ids = attachments.pluck('id');						    
+			    this.update_field(ids);
+			    
+		    },
+			
+			_select: function() {
+				
+				//19,31,30 
+				//console.log(wp.media[this.options.field_name]);
+				
+				//console.log( this.$field_input.val() );
+				var attachment;
+				var selection = wp.media[this.options.field_name].frame().state().get('selection');
+				//var selection = new wp.media.model.Selection([], {multiple: true});
+			
+				var ids = this.$field_input.val().split(',');
+                ids.forEach(function(id) {
+                    attachment = wp.media.attachment(id);
+                    attachment.fetch();
+                    selection.add( attachment ? [ attachment ] : [] );
+                });
+                
+                return selection;
+                
+            },
 			
 			select: function() {
-				    console.log(this.$field_input.val());
+				
 			    var shortcode = wp.shortcode.next( 'gallery', '[gallery ids="'+this.$field_input.val()+'"]'  ),
 			        defaultPostId = wp.media.gallery.defaults.id,
 			        attachments, selection;
@@ -197,13 +257,14 @@ events: {
 			        shortcode.set( 'id', defaultPostId );
 			 
 			    attachments = wp.media.gallery.attachments( shortcode );
+			    
 			    selection = new wp.media.model.Selection( attachments.models, {
 			        props:    attachments.props.toJSON(),
 			        multiple: true
 			    });
 			     
 			    selection.gallery = attachments.gallery;
-			 
+
 			    // Fetch the query's attachments, and then break ties from the
 			    // query to allow for sorting.
 			    selection.more().done( function() {
@@ -212,6 +273,7 @@ events: {
 			        selection.unmirror();
 			        selection.props.unset('orderby');
 			    });
+
 			    return selection;
 			},
 			
@@ -226,6 +288,7 @@ var BCFPost = media.view.MediaFrame.Post.extend({
 
 	initialize: function() {
 		_.defaults( this.options, {
+			selection: [],
 			multiple:  true,
 			editing:   true,
 			state:    'insert'
@@ -235,6 +298,7 @@ var BCFPost = media.view.MediaFrame.Post.extend({
 		this.createIframeStates();
 	},
 	createStates: function() {
+		
 		var options = this.options;
 
 		// Add the default states.
@@ -244,8 +308,8 @@ var BCFPost = media.view.MediaFrame.Post.extend({
 				id:         'insert',
 				title:      l10n.insertMediaTitle,
 				priority:   20,
-				toolbar:    'main-insert',
 				filterable: 'all',
+				toolbar: options.multiple ? 'main-insert' : 'select',
 				library:    media.query( options.library ),
 				multiple:   options.multiple ? 'reset' : false,
 				editable:   true,
