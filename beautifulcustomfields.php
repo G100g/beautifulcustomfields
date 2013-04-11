@@ -462,6 +462,7 @@ class Beautiful_custom_fields {
 			function check_template(template) {
 
 				template = template.replace(".", "-");
+				template = template.replace("/", "-");
 
 				bc_update_forms_class('bcf_page_template_'+last_template, 'remove');
 				
@@ -925,7 +926,8 @@ class Beautiful_custom_fields {
 					
 				} 
 				foreach ($field->page_template_ids as $_pt) {
-					$class_post_type .= " bcf_page_template_".str_replace(".", "-", $_pt);	
+					//$class_post_type .= " bcf_page_template_".str_replace(".", "-", $_pt);
+					$class_post_type .= " bcf_page_template_".str_replace(array(".", "/"), "-", $_pt);	
 				}
 				
 			}
