@@ -119,6 +119,7 @@ require(dirname(__FILE__).'/widgets/bcf_wgt_multicheckbox.php');
 require(dirname(__FILE__).'/widgets/bcf_wgt_chooser.php');
 require(dirname(__FILE__).'/widgets/bcf_wgt_chooser_post_attachments.php');
 require(dirname(__FILE__).'/widgets/bcf_wgt_chooser_posts.php');
+require(dirname(__FILE__).'/widgets/bcf_wgt_media.php');
 require(dirname(__FILE__).'/widgets/bcf_wgt_gallery.php');
 
 
@@ -142,7 +143,8 @@ function bcf_standard_widgets($types) {
 							'chooser' => 'Chooser with autosuggest',
 							'chooser_post_attachments' => 'Post Attachments',
 							'chooser_posts' => 'Choose from Posts, Page And Custom Post Types',
-							'gallery' => 'Galleria Immagini'
+							'media' => 'Media',
+							'gallery' => 'Images Gallery'
 							
 							/*, 
 							'textarea' => "Textarea",

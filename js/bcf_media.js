@@ -1,8 +1,8 @@
-var bcf_gallery = {};
+var bcf_media = {};
 		
 (function ($) {
 	
-		bcf_gallery = Backbone.View.extend({
+		bcf_media = Backbone.View.extend({
 	/*
 events: {
 			    "click .icon":          "open",
