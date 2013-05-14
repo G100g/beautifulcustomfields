@@ -39,7 +39,10 @@ class bcf_chooser_posts extends bcf_chooser {
 		
 		public function options_posts($options, $value) {
 
-			$post_id = $_REQUEST["post_id"];
+			global $post;
+
+			//$post_id = $_REQUEST["post_id"];
+			$post_id = $post->ID;
 			$values = $this->get_posts($post_id, $value, $options);
 			
 			return $values;
