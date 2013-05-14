@@ -51,12 +51,9 @@ class bcf_chooser_posts extends bcf_chooser {
 			
 			global $post;
 			
-			$post_types = $options[0];
+			$post_types = explode(",", $options[0]);
 			
 			$_post = $post;
-			
-			
-		
 			//Becco i post di tipo projects che ho segnato
 			
 			$args = array(
