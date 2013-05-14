@@ -16,7 +16,11 @@ class Beautiful_custom_fields_admin {
 		//add_action( "admin_print_styles", array(&$this, 'add_style'), 10);
 		//add_action( "admin_print_scripts", array(&$this, 'add_javascript'), 10);
 		add_action( "admin_enqueue_scripts", array(&$this, 'add_style'), 10);
-		add_action( "admin_enqueue_scripts", array(&$this, 'add_javascript'), 10);
+		//add_action( "admin_enqueue_scripts", array(&$this, 'add_javascript'), 10);
+		//add_action( "admin_print_scripts-options.php", 'add_javascript' );
+		add_action( "admin_enqueue_scripts", array(&$this, 'add_javascript') );
+		
+ 
 		
 		
 		add_action('admin_menu', array(&$this, 'admin_menu'), 10);
@@ -29,15 +33,16 @@ class Beautiful_custom_fields_admin {
 		//$this->fields_types = new Beautiful_custom_fields_types();
 	}
 	
-	function add_style() {
-	
-		wp_enqueue_style('bcf_admin_style', plugins_url( 'css/admin.css', __FILE__ ), NULL, '1.0');
-	
+	function add_style($hook) {
+		if ($hook == 'settings_page_bcf_admin')
+			wp_enqueue_style('bcf_admin_style', plugins_url( 'css/admin.css', __FILE__ ), NULL, '1.0');
 	}
 	
-	function add_javascript() {
+	function add_javascript($hook) {
 	
-		wp_enqueue_script('bcf_admin', plugins_url( 'js/admin.js', __FILE__ ), array('jquery-ui-sortable'), '1.0');
+		//Aggiungo il javascript se sono nella pagina delle opzioni
+		if ($hook == 'settings_page_bcf_admin')
+			wp_enqueue_script('bcf_admin', plugins_url( 'js/admin.js', __FILE__ ), array('jquery-ui-sortable'), '1.0');
 		
 	
 		//wp_enqueue_script('jquery');
