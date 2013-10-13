@@ -39,32 +39,35 @@ class bcf_chooser_posts extends bcf_chooser {
 		
 		public function options_posts($options, $value) {
 
-			$post_id = $_REQUEST["post_id"];
-			$values = $this->get_posts($post_id, $value, $options);
+			$exclude_posts = null;
+			if (array_key_exists("post_id", $_REQUEST)) {
+				$exclude_posts = array($_REQUEST["post_id"]);
+			}
+			$values = $this->get_posts($value, $options, $exclude_posts);
 			
 			return $values;
 		
 		}
 		
-		protected function get_posts($post_id, $value, $options = array()) {
-		//$values, $value, $post_types = '') {
+		protected function get_posts($value, $options = array(), $exclude_posts = null) {
 			
 			global $post;
 			
-			$post_types = $options[0];
+			$post_types = explode(",", $options[0]);
 			
 			$_post = $post;
-			
-			
-		
-			//Becco i post di tipo projects che ho segnato
-			
 			$args = array(
 						'post_type' => $post_types,
 						'posts_per_page' => -1,
 						'orderby' => 'title', 
 						'order' => 'asc'		
 						);
+			
+			if ($exclude_posts != null) {
+				
+				$args["post__not_in"] = $exclude_posts;
+				
+			}
 						 	
 			if (isset($_REQUEST["q"]) && !empty($_REQUEST["q"])) {
 				

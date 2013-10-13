@@ -305,7 +305,7 @@ class Beautiful_custom_fields {
 				//Disattivo quelli che non corrispondono
 				
 				$('.postbox tr.bcf_row').hide();
-				$('.postbox tr.bcf_row :input').attr('disabled', 'disabled');
+				//$('.postbox tr.bcf_row :input').attr('disabled', 'disabled');
 
 				//attivo quelli con determinate classi					
 				$('.postbox tr'+box_class).show();
@@ -319,6 +319,8 @@ class Beautiful_custom_fields {
 					$('.postbox tr.'+bc_fields_names+' :input').attr('disabled', false);
 					
 				}
+				
+				console.log(bc_fields_names);
 				
 				/*
 				$('#bcf_metabox tr.bcf_row').hide();
@@ -372,8 +374,7 @@ class Beautiful_custom_fields {
 
 <?php		foreach($field as $f) : ?>
 			
-			bc_update_forms_fields('<?php echo $f; ?>', ($(this).attr('checked') != "" || e.type == 'bcf_taxonomy_click_action' ? 'add' : 'remove'));
-
+			bc_update_forms_fields('<?php echo $f; ?>', ($(this).attr('checked') || e.type == 'bcf_taxonomy_click_action' ? 'add' : 'remove'));
 			
 <?php		endforeach; ?>		
 
