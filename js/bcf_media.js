@@ -182,10 +182,25 @@ events: {
 			},
 			
 			update_preview: function (attachments) {
-		    	var _self = this;
+		    	var _self = this,
+		    		icon_image
+		    	;
 		    	this.$preview.html("");
+		    	
+		    	console.log(attachments);
+		    	
 	        	$.each(attachments, function(i, attachment) {
-	        		var icon_image = attachment.type == 'image' ? attachment.sizes.thumbnail.url : attachment.icon;
+	        		
+	        		if (attachment.type != 'image') {
+		        		icon_image = attachment.icon;
+	        		} else {
+		        		if (attachment.sizes.thumbnail) {
+		        			icon_image = attachment.sizes.thumbnail.url;
+						} else {
+			        		icon_image = attachment.sizes.full.url;
+						}
+	        		}
+	        		
 	        	    _self.$preview.append('<span class="thumbnail '+attachment.type+'"><img src="'+icon_image+'" /><span class="title">'+attachment.filename+'</span></span>');
 			    });
 			    
